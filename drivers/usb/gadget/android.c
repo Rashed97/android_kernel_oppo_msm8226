@@ -34,10 +34,8 @@
 #include <mach/diag_dload.h>
 
 #include "gadget_chips.h"
-#ifdef VENDOR_EDIT
 //Zhilong.Zhang@OnlineRd.Driver, 2013/12/19, Add for support mass storage in recovery mode
 #include <mach/oppo_boot_mode.h>
-#endif /* VENDOR_EDIT */
 
 /*
  * Kbuild is not very cooperative with respect to linking separately
@@ -1820,19 +1818,14 @@ static int mass_storage_function_init(struct android_usb_function *f,
 		name[config->fsg.nluns] = "lun1";
 		config->fsg.nluns++;
 	}
-#ifndef VENDOR_EDIT 
-//Zhilong.Zhang@OnlineRd.Driver, 2013/12/19, Modify for support CD-ROM in normal mode and support mass storage in recovery mode
-	config->fsg.luns[0].removable = 1;
-#else /* VENDOR_EDIT */
 	if(get_boot_mode() == MSM_BOOT_MODE__RECOVERY) {
-		config->fsg.luns[0].removable = 1;
+	config->fsg.luns[0].removable = 1;
 	}
 	else {
 		config->fsg.luns[0].cdrom = 1;
 		config->fsg.luns[0].ro = 1;
 		config->fsg.luns[0].removable = 0;	
 	}
-#endif /* VENDOR_EDIT */	
 
 	common = fsg_common_init(NULL, cdev, &config->fsg);
 	if (IS_ERR(common)) {
@@ -2747,10 +2740,8 @@ android_setup(struct usb_gadget *gadget, const struct usb_ctrlrequest *c)
 	struct android_configuration	*conf;
 	int value = -EOPNOTSUPP;
 	unsigned long flags;
-    #ifdef VENDOR_EDIT
-    //zhanhua.li@Prd.BasicDrv.USB,2014/02/26 add for debug
-    printk("%s enter\n",__func__);
-    #endif /*VENDOR_EDIT*/
+
+	printk("%s enter\n",__func__);
 	req->zero = 0;
 	req->complete = composite_setup_complete;
 	req->length = 0;
@@ -2805,10 +2796,7 @@ static void android_disconnect(struct usb_gadget *gadget)
 
 	spin_lock_irqsave(&cdev->lock, flags);
 	dev->connected = 0;
-	#ifdef VENDOR_EDIT
-    //zhanhua.li@Prd.BasicDrv.USB,2014/02/26 add for debug
-    printk("%s enter\n",__func__);
-    #endif /*VENDOR_EDIT*/
+	printk("%s enter\n",__func__);
 	schedule_work(&dev->work);
 	spin_unlock_irqrestore(&cdev->lock, flags);
 }
@@ -2822,10 +2810,7 @@ static void android_suspend(struct usb_gadget *gadget)
 	spin_lock_irqsave(&cdev->lock, flags);
 	if (!dev->suspended) {
 		dev->suspended = 1;
-		#ifdef VENDOR_EDIT
-        //zhanhua.li@Prd.BasicDrv.USB,2014/02/26 add for debug
         printk("%s enter\n",__func__);
-        #endif /*VENDOR_EDIT*/
 		schedule_work(&dev->work);
 	}
 	spin_unlock_irqrestore(&cdev->lock, flags);
@@ -2842,10 +2827,7 @@ static void android_resume(struct usb_gadget *gadget)
 	spin_lock_irqsave(&cdev->lock, flags);
 	if (dev->suspended) {
 		dev->suspended = 0;
-		#ifdef VENDOR_EDIT
-        //zhanhua.li@Prd.BasicDrv.USB,2014/02/26 add for debug
         printk("%s enter\n",__func__);
-        #endif /*VENDOR_EDIT*/
 		schedule_work(&dev->work);
 	}
 	spin_unlock_irqrestore(&cdev->lock, flags);

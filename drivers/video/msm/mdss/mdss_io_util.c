@@ -208,16 +208,12 @@ int msm_dss_enable_vreg(struct dss_vreg *in_vreg, int num_vreg, int enable)
 {
 	int i = 0, rc = 0;
 
-#ifdef VENDOR_EDIT
 //rendong.shi@BasiceDrv.LCD add 2014/03/26 for lcd 2.8v&1.8v never powerdown when suspend
-    int boot_mode = 0;
+	int boot_mode = 0;
 	static int vddio_enable_flag = 0;
 	static int vdd_enable_flag = 0;
-#endif /*VENDOR_EDIT*/	
 	if (enable) {
 		for (i = 0; i < num_vreg; i++) {
-
-#ifdef VENDOR_EDIT
 //rendong.shi@BasiceDrv.LCD add 2014/03/26 for lcd 2.8v&1.8v never powerdown when suspend
        	boot_mode = get_boot_mode();
        
@@ -245,8 +241,7 @@ int msm_dss_enable_vreg(struct dss_vreg *in_vreg, int num_vreg, int enable)
 					pr_err("after enable ,never do second for vddio\n");
 					continue;
 				}									
-			}		
-#endif /*VENDOR_EDIT*/		
+			}	
 			rc = PTR_RET(in_vreg[i].vreg);
 			if (rc) {
 				DEV_ERR("%pS->%s: %s regulator error. rc=%d\n",
