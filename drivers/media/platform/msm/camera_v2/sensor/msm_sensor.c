@@ -19,10 +19,7 @@
 #include <mach/rpm-regulator.h>
 #include <mach/rpm-regulator-smd.h>
 #include <linux/regulator/consumer.h>
-
-//#ifndef CONFIG_MSMB_CAMERA_DEBUG //lxl add 
-//#define CONFIG_MSMB_CAMERA_DEBUG //lxl add 
-//#endif  //lxl add
+#include <linux/proc_fs.h>
 
 #undef CDBG
 #ifdef CONFIG_MSMB_CAMERA_DEBUG
@@ -31,17 +28,10 @@
 #define CDBG(fmt, args...) do { } while (0)
 #endif
 
-/* OPPO 2013-12-18 yingpiao.lin modify begin for bug gpio-standby is none */
-#ifdef VENDOR_EDIT
 #define UNDEFINE_GPIO 0XFFFF
-#endif
-/* OPPO 2013-12-18 yingpiao.lin Add modify end */
 
-#ifdef VENDOR_EDIT
-//jindian.guan@Camera, 2014/04/14, Add proc for sensor state
 static struct msm_sensor_ctrl_t *gs_ctrl_back = NULL;
 static struct msm_sensor_ctrl_t *gs_ctrl_front = NULL;
-#endif
 static int32_t msm_sensor_enable_i2c_mux(struct msm_camera_i2c_conf *i2c_conf)
 {
 	struct v4l2_subdev *i2c_mux_sd =
@@ -584,11 +574,9 @@ int32_t msm_sensor_init_gpio_pin_tbl(struct device_node *of_node,
 		CDBG("%s qcom,gpio-reset %d\n", __func__,
 			gconf->gpio_num_info->gpio_num[SENSOR_GPIO_STANDBY]);
 /* OPPO 2013-12-18 yingpiao.lin modify begin for bug gpio-standby is none */
-#ifdef VENDOR_EDIT
     } else {
 			gconf->gpio_num_info->gpio_num[SENSOR_GPIO_STANDBY] =
 				UNDEFINE_GPIO;
-#endif
 /* OPPO 2013-12-18 yingpiao.lin Add modify end */
 	}
 
@@ -1045,13 +1033,9 @@ int32_t msm_sensor_power_up(struct msm_sensor_ctrl_t *s_ctrl)
 					SENSOR_GPIO_MAX);
 				goto power_up_failed;
 			}
-/* OPPO 2013-12-18 yingpiao.lin modify begin for bug gpio-standby is none */
-#ifdef VENDOR_EDIT
 			if (data->gpio_conf->gpio_num_info->gpio_num
 				[power_setting->seq_val] == UNDEFINE_GPIO)
 				continue;
-#endif
-/* OPPO 2013-12-18 yingpiao.lin Add modify end */
 			pr_debug("%s:%d gpio set val %d\n", __func__, __LINE__,
 				data->gpio_conf->gpio_num_info->gpio_num
 				[power_setting->seq_val]);
@@ -1135,13 +1119,9 @@ power_up_failed:
 				0);
 			break;
 		case SENSOR_GPIO:
-/* OPPO 2013-12-18 yingpiao.lin modify begin for bug gpio-standby is none */
-#ifdef VENDOR_EDIT
 			if (data->gpio_conf->gpio_num_info->gpio_num
 				[power_setting->seq_val] == UNDEFINE_GPIO)
 				continue;
-#endif
-/* OPPO 2013-12-18 yingpiao.lin Add modify end */
 			gpio_set_value_cansleep(
 				data->gpio_conf->gpio_num_info->gpio_num
 				[power_setting->seq_val], GPIOF_OUT_INIT_LOW);
@@ -1211,11 +1191,9 @@ int32_t msm_sensor_power_down(struct msm_sensor_ctrl_t *s_ctrl)
 				continue;
 			}
 /* OPPO 2013-12-18 yingpiao.lin modify begin for bug gpio-standby is none */
-#ifdef VENDOR_EDIT
 			if (data->gpio_conf->gpio_num_info->gpio_num
 				[power_setting->seq_val] == UNDEFINE_GPIO)
 				continue;
-#endif
 /* OPPO 2013-12-18 yingpiao.lin Add modify end */
 			gpio_set_value_cansleep(
 				data->gpio_conf->gpio_num_info->gpio_num
@@ -1270,7 +1248,7 @@ int32_t msm_sensor_match_id(struct msm_sensor_ctrl_t *s_ctrl)
 		return rc;
 	}
 
-	printk("%s: read id: %x expected id %x:\n", __func__, chipid,
+	CDBG("%s: read id: %x expected id %x:\n", __func__, chipid,
 		s_ctrl->sensordata->slave_info->sensor_id);
 	if (chipid != s_ctrl->sensordata->slave_info->sensor_id) {
 		pr_err("msm_sensor_match_id chip id doesnot match\n");
@@ -1298,8 +1276,6 @@ static void msm_sensor_stop_stream(struct msm_sensor_ctrl_t *s_ctrl)
 	return;
 }
 
-/* OPPO 2014-01-21 zhangzr merge begin from find7 for at test */
-#ifdef VENDOR_EDIT
 static void at_msm_sensor_power_down(struct msm_sensor_ctrl_t *s_ctrl)
 {
 	pr_err("%s cmd is 0 \n", __func__);
@@ -1318,8 +1294,7 @@ static void at_msm_sensor_power_up(struct msm_sensor_ctrl_t *s_ctrl)
 	}
 	return;
 }
-#endif
-/* OPPO 2014-01-21 zhangzr merge end */
+
 static int msm_sensor_get_af_status(struct msm_sensor_ctrl_t *s_ctrl,
 			void __user *argp)
 {
@@ -1329,9 +1304,8 @@ static int msm_sensor_get_af_status(struct msm_sensor_ctrl_t *s_ctrl,
 	return 0;
 }
 
-#ifdef VENDOR_EDIT
 //jindian.guan@Camera, 2014/04/14, Add proc for sensor state
-#include <linux/proc_fs.h>
+
 static int sensor_proc_read(char *page, char **start, off_t off, int count,
    int *eof, void *data)
 {
@@ -1358,9 +1332,9 @@ static int sensor_proc_read(char *page, char **start, off_t off, int count,
 static int sensor_proc_write(struct file *filp, const char __user *buff,
                         	unsigned long len, void *data)
 {
-
 	return 0;
 }
+
 static int sensor_proc_read_front(char *page, char **start, off_t off, int count,
    int *eof, void *data)
 {
@@ -1387,9 +1361,9 @@ static int sensor_proc_read_front(char *page, char **start, off_t off, int count
 static int sensor_proc_write_front(struct file *filp, const char __user *buff,
                         	unsigned long len, void *data)
 {
-
 	return 0;
 }
+
 static int sensor_proc_init(struct msm_sensor_ctrl_t *sensor_ctl)
 {
 	int ret=0;
@@ -1431,7 +1405,7 @@ static int sensor_proc_init(struct msm_sensor_ctrl_t *sensor_ctl)
 		  proc_entry->write_proc = sensor_proc_write_front;
 	      temp++;
 		  pr_err("[%s]: create qcom_sensor_state_1 proc success \n", __func__);
-	    }	
+	    }
 	   }
 	else
 	 	{
@@ -1441,7 +1415,6 @@ static int sensor_proc_init(struct msm_sensor_ctrl_t *sensor_ctl)
 
 	return ret;
 }
-#endif /* VENDOR_EDIT */
 
 static long msm_sensor_subdev_ioctl(struct v4l2_subdev *sd,
 			unsigned int cmd, void *arg)
@@ -1452,8 +1425,6 @@ static long msm_sensor_subdev_ioctl(struct v4l2_subdev *sd,
 		pr_err("%s s_ctrl NULL\n", __func__);
 		return -EBADF;
 	}
-/* OPPO 2014-01-21 zhangzr merge begin from find7 for at test */
-#ifdef VENDOR_EDIT
 	if (cmd == 0 && arg == NULL) {
 		at_msm_sensor_power_down(s_ctrl);
 		return 0;
@@ -1461,8 +1432,6 @@ static long msm_sensor_subdev_ioctl(struct v4l2_subdev *sd,
 		at_msm_sensor_power_up(s_ctrl);
 		return 0;
 	}
-#endif
-/* OPPO 2014-01-21 zhangzr merge end */
 	switch (cmd) {
 	case VIDIOC_MSM_SENSOR_CFG:
 		return s_ctrl->func_tbl->sensor_config(s_ctrl, argp);
@@ -1494,12 +1463,8 @@ int32_t msm_sensor_config(struct msm_sensor_ctrl_t *s_ctrl,
 			sizeof(cdata->cfg.sensor_info.sensor_name));
 		cdata->cfg.sensor_info.session_id =
 			s_ctrl->sensordata->sensor_info->session_id;
-#ifdef VENDOR_EDIT
-//lxl add for add camera module vendor info 0xa1 sunny and 0xa2 truly
 		cdata->cfg.sensor_info.module_vendor_id =
 			s_ctrl->sensordata->sensor_info->module_vendor_id;
-#endif
-//lxl end
 		for (i = 0; i < SUB_MODULE_MAX; i++)
 			cdata->cfg.sensor_info.subdev_id[i] =
 				s_ctrl->sensordata->sensor_info->subdev_id[i];
@@ -2082,10 +2047,7 @@ int32_t msm_sensor_platform_probe(struct platform_device *pdev, void *data)
 
 	s_ctrl->func_tbl->sensor_power_down(s_ctrl);
 	CDBG("%s:%d\n", __func__, __LINE__);
-#ifdef VENDOR_EDIT
-//jindian.guan@Camera, 2014/04/14, Add proc for sensor state
-      sensor_proc_init(s_ctrl);
-#endif
+        sensor_proc_init(s_ctrl);
 	return rc;
 }
 

@@ -38,20 +38,20 @@ DEFINE_MSM_MUTEX(hi258_mut);
 static struct msm_sensor_ctrl_t hi258_s_ctrl;
 
 //lxl modify
-static struct msm_sensor_power_setting hi258_power_setting[] = 
+static struct msm_sensor_power_setting hi258_power_setting[] =
 {
-	{ 
+	{
 		.seq_type = SENSOR_GPIO,
 		.seq_val = SENSOR_GPIO_STANDBY,
 		.config_val = GPIO_OUT_LOW,
 		.delay = 5,
-	},	
-	{ 
+	},
+	{
 		.seq_type = SENSOR_GPIO,
 		.seq_val = SENSOR_GPIO_STANDBY,
 		.config_val = GPIO_OUT_HIGH,
 		.delay = 20,
-	},	
+	},
 	{
 		.seq_type = SENSOR_GPIO,
 		.seq_val = SENSOR_GPIO_RESET,
@@ -104,66 +104,66 @@ static struct msm_sensor_power_setting hi258_power_setting[] =
 
 static struct msm_camera_i2c_reg_conf hi258_uxga_settings[] = {
 /* 2M FULL Mode */
-{0x03, 0x00},  	
+{0x03, 0x00},
 {0x01, 0x01},  // HI258_Sleep_Mode
-{0x11, 0x90},		
-// 1600*1200	
-{0x03, 0x00}, 
-{0x10, 0x00}, 
-{0xd2, 0x01},  //isp_div[1:0] mipi_4x_div[3:2]  mipi_1x_div[4] pll_bias_opt[7:5]    
+{0x11, 0x90},
+// 1600*1200
+{0x03, 0x00},
+{0x10, 0x00},
+{0xd2, 0x01},  //isp_div[1:0] mipi_4x_div[3:2]  mipi_1x_div[4] pll_bias_opt[7:5]
 
-{0x03, 0x48}, 
-{0x30, 0x0c}, 
-{0x31, 0x80}, 
+{0x03, 0x48},
+{0x30, 0x0c},
+{0x31, 0x80},
 
-{0x03, 0x00},  
+{0x03, 0x00},
 {0x12, 0x04},  // CLK_DIV_REG
 
 {0x03, 0x10},
 {0x11, 0x03},
 {0x12, 0xf0},
 {0x13, 0x03},
-{0x42, 0x08}, 
+{0x42, 0x08},
 
 {0x03, 0x18},//Scaling off
 {0x10, 0x00},
 
 
 {0x03, 0x20},
-//{0x10, 0x1c}, 
-//{0x18, 0x38}, 
+//{0x10, 0x1c},
+//{0x18, 0x38},
 {0xb2, 0xc8},
 
 
 
-//{0x83, 0x09}, //EXP Normal 10.00 fps 
-//{0x84, 0xea}, 
-//{0x85, 0xfc}, 
+//{0x83, 0x09}, //EXP Normal 10.00 fps
+//{0x84, 0xea},
+//{0x85, 0xfc},
 {0x86, 0x01}, //EXPMin 13800.42 fps
-{0x87, 0xd7}, 
-{0x88, 0x09}, //EXP Max 60hz 10.00 fps 
-{0x89, 0xea}, 
-{0x8a, 0xfc}, 
-{0xa5, 0x09}, //EXP Max 50hz 10.00 fps 
-{0xa6, 0xea}, 
-{0xa7, 0xfc}, 
-{0x8B, 0xfd}, //EXP100 
-{0x8C, 0xe6}, 
-{0x8D, 0xd3}, //EXP120 
-{0x8E, 0x95}, 
-{0x9c, 0x19}, //EXP Limit 985.74 fps 
-{0x9d, 0xc2}, 
-{0x9e, 0x01}, //EXP Unit 
-{0x9f, 0xd7}, 
-{0xa3, 0x00}, //Outdoor Int 
-{0xa4, 0xd3}, 
+{0x87, 0xd7},
+{0x88, 0x09}, //EXP Max 60hz 10.00 fps
+{0x89, 0xea},
+{0x8a, 0xfc},
+{0xa5, 0x09}, //EXP Max 50hz 10.00 fps
+{0xa6, 0xea},
+{0xa7, 0xfc},
+{0x8B, 0xfd}, //EXP100
+{0x8C, 0xe6},
+{0x8D, 0xd3}, //EXP120
+{0x8E, 0x95},
+{0x9c, 0x19}, //EXP Limit 985.74 fps
+{0x9d, 0xc2},
+{0x9e, 0x01}, //EXP Unit
+{0x9f, 0xd7},
+{0xa3, 0x00}, //Outdoor Int
+{0xa4, 0xd3},
 
-{0x10, 0x9c}, 
-//{0x18, 0x30}, 
+{0x10, 0x9c},
+//{0x18, 0x30},
 
 
 
-{0x03,0x00},  	
+{0x03,0x00},
 {0x01, 0x00},  // HI258_Sleep_Mode
 
 };
@@ -172,20 +172,20 @@ static struct msm_camera_i2c_reg_conf hi258_uxga_settings[] = {
 #if 1
 static struct msm_camera_i2c_reg_conf hi258_480p_settings[] = {
 /* 720*480**24-30fps */
-{0x03, 0x00},  	
+{0x03, 0x00},
 {0x01, 0x01},  // HI258_Sleep_Mode
 {0x11, 0x94},
 
 
-{0x03, 0x10},  	
+{0x03, 0x10},
 {0x41, 0x08},
 
 
 
-// 1600*1200	
-{0x03, 0x00}, 
-{0x10, 0x13}, 
-{0xd2, 0x01},  //isp_div[1:0] mipi_4x_div[3:2]  mipi_1x_div[4] pll_bias_opt[7:5]    
+// 1600*1200
+{0x03, 0x00},
+{0x10, 0x13},
+{0xd2, 0x01},  //isp_div[1:0] mipi_4x_div[3:2]  mipi_1x_div[4] pll_bias_opt[7:5]
 
 {0x03, 0x18},
 {0x12, 0x20},
@@ -213,32 +213,32 @@ static struct msm_camera_i2c_reg_conf hi258_480p_settings[] = {
 {0x18, 0x38},
 {0x10, 0x1c},
 {0xb2, 0xf0},
-	
 
-{0x83, 0x02}, //EXP Normal 27.33 fps 
-{0x84, 0xf7}, 
-{0x85, 0xb7}, 
+
+{0x83, 0x02}, //EXP Normal 27.33 fps
+{0x84, 0xf7},
+{0x85, 0xb7},
 {0x86, 0x01}, //EXPMin 24163.57 fps
-{0x87, 0x0d}, 
-{0x88, 0x03}, //EXP Max 60hz 27.00 fps 
-{0x89, 0x4c}, 
-{0x8a, 0xd4}, 
-{0xa5, 0x02}, //EXP Max 50hz 27.33 fps 
-{0xa6, 0xf7}, 
-{0xa7, 0xb7}, 
-{0x8B, 0xfd}, //EXP100 
-{0x8C, 0x3d}, 
-{0x8D, 0xd3}, //EXP120 
-{0x8E, 0x35}, 
+{0x87, 0x0d},
+{0x88, 0x03}, //EXP Max 60hz 27.00 fps
+{0x89, 0x4c},
+{0x8a, 0xd4},
+{0xa5, 0x02}, //EXP Max 50hz 27.33 fps
+{0xa6, 0xf7},
+{0xa7, 0xb7},
+{0x8B, 0xfd}, //EXP100
+{0x8C, 0x3d},
+{0x8D, 0xd3}, //EXP120
+{0x8E, 0x35},
 {0x91, 0x01}, //EXP Fix 27.03 fps
-{0x92, 0xd5}, 
-{0x93, 0xb3}, 
-{0x9c, 0x0e}, //EXP Limit 1725.97 fps 
-{0x9d, 0xb6}, 
-{0x9e, 0x01}, //EXP Unit 
-{0x9f, 0x0d}, 
-{0xa3, 0x00}, //Outdoor Int 
-{0xa4, 0xd3}, 
+{0x92, 0xd5},
+{0x93, 0xb3},
+{0x9c, 0x0e}, //EXP Limit 1725.97 fps
+{0x9d, 0xb6},
+{0x9e, 0x01}, //EXP Unit
+{0x9f, 0x0d},
+{0xa3, 0x00}, //Outdoor Int
+{0xa4, 0xd3},
 
 
 
@@ -251,18 +251,18 @@ static struct msm_camera_i2c_reg_conf hi258_480p_settings[] = {
 {0x31, 0xa0}, //long_packet word count
 
 
-{0x03, 0x00},  
+{0x03, 0x00},
 {0x12, 0x04},  // CLK_DIV_REG
 
 
-{0x03, 0x00},  	
+{0x03, 0x00},
 {0x01, 0x00},  // HI258_Sleep_Mode
 
 };
 #else
 static struct msm_camera_i2c_reg_conf hi258_480p_settings[] = {
 /* 640*480**27fps */
-{0x03, 0x00},  	
+{0x03, 0x00},
 {0x01, 0x01},  // HI258_Sleep_Mode
 {0x11, 0x94},
 
@@ -273,10 +273,10 @@ static struct msm_camera_i2c_reg_conf hi258_480p_settings[] = {
 {0x41, 0x08},
 
 
-// 1600*1200	
-{0x03, 0x00}, 
-{0x10, 0x13}, 
-{0xd2, 0x01},  //isp_div[1:0] mipi_4x_div[3:2]  mipi_1x_div[4] pll_bias_opt[7:5]    
+// 1600*1200
+{0x03, 0x00},
+{0x10, 0x13},
+{0xd2, 0x01},  //isp_div[1:0] mipi_4x_div[3:2]  mipi_1x_div[4] pll_bias_opt[7:5]
 
 {0x03, 0x18},
 {0x10, 0x07},
@@ -305,32 +305,32 @@ static struct msm_camera_i2c_reg_conf hi258_480p_settings[] = {
 {0x18, 0x38},
 {0x10, 0x1c},
 {0xb2, 0xf0},
-	
 
-{0x83, 0x02}, //EXP Normal 33.33 fps 
-{0x84, 0xf7}, 
-{0x85, 0xb7}, 
+
+{0x83, 0x02}, //EXP Normal 33.33 fps
+{0x84, 0xf7},
+{0x85, 0xb7},
 {0x86, 0x01}, //EXPMin 24163.57 fps
-{0x87, 0x0d}, 
-{0x88, 0x03}, //EXP Max 60hz 30.00 fps 
-{0x89, 0x4c}, 
-{0x8a, 0xd4}, 
-{0xa5, 0x02}, //EXP Max 50hz 33.33 fps 
-{0xa6, 0xf7}, 
-{0xa7, 0xb7}, 
-{0x8B, 0xfd}, //EXP100 
-{0x8C, 0x3d}, 
-{0x8D, 0xd3}, //EXP120 
-{0x8E, 0x35}, 
+{0x87, 0x0d},
+{0x88, 0x03}, //EXP Max 60hz 30.00 fps
+{0x89, 0x4c},
+{0x8a, 0xd4},
+{0xa5, 0x02}, //EXP Max 50hz 33.33 fps
+{0xa6, 0xf7},
+{0xa7, 0xb7},
+{0x8B, 0xfd}, //EXP100
+{0x8C, 0x3d},
+{0x8D, 0xd3}, //EXP120
+{0x8E, 0x35},
 {0x91, 0x01}, //EXP Fix 27.03 fps
-{0x92, 0xd5}, 
-{0x93, 0xb3}, 
-{0x9c, 0x0e}, //EXP Limit 1725.97 fps 
-{0x9d, 0xb6}, 
-{0x9e, 0x01}, //EXP Unit 
-{0x9f, 0x0d}, 
-{0xa3, 0x00}, //Outdoor Int 
-{0xa4, 0xd3}, 
+{0x92, 0xd5},
+{0x93, 0xb3},
+{0x9c, 0x0e}, //EXP Limit 1725.97 fps
+{0x9d, 0xb6},
+{0x9e, 0x01}, //EXP Unit
+{0x9f, 0x0d},
+{0xa3, 0x00}, //Outdoor Int
+{0xa4, 0xd3},
 
 
 
@@ -344,11 +344,11 @@ static struct msm_camera_i2c_reg_conf hi258_480p_settings[] = {
 {0x31, 0x00}, //long_packet word count
 
 
-{0x03, 0x00},  
+{0x03, 0x00},
 {0x12, 0x04},  // CLK_DIV_REG
 
 
-{0x03, 0x00},  	
+{0x03, 0x00},
 {0x01, 0x00},  // HI258_Sleep_Mode
 
 };
@@ -392,10 +392,10 @@ static struct msm_camera_i2c_reg_conf hi258_recommend_settings[] = {
 {0x0a, 0x00}, //131002 pad strength 07->00
 
 //PLL Setting
-{0x03, 0x00}, 
+{0x03, 0x00},
 {0xd0, 0x05}, //PLL pre_div 1/6 = 4 Mhz
-{0xd1, 0x34}, //PLL maim_div 
-{0xd2, 0x01}, //isp_div[1:0] mipi_4x_div[3:2]  mipi_1x_div[4] pll_bias_opt[7:5]    
+{0xd1, 0x34}, //PLL maim_div
+{0xd2, 0x01}, //isp_div[1:0] mipi_4x_div[3:2]  mipi_1x_div[4] pll_bias_opt[7:5]
 {0xd3, 0x20}, //isp_clk_inv[0]  mipi_4x_inv[1]  mipi_1x_inv[2]
 {0xd0, 0x85},
 {0xd0, 0x85},
@@ -440,13 +440,13 @@ static struct msm_camera_i2c_reg_conf hi258_recommend_settings[] = {
 {0x26, 0x06}, //Window width_H  //= 1600
 {0x27, 0x40}, //Window wight_L
 
-{0x28, 0x04}, //Full row start y-flip 
+{0x28, 0x04}, //Full row start y-flip
 {0x29, 0x01}, //Pre1 row start no-flip
-{0x2a, 0x02}, //Pre1 row start y-flip 
+{0x2a, 0x02}, //Pre1 row start y-flip
 
-{0x2b, 0x04}, //Full wid start x-flip 
+{0x2b, 0x04}, //Full wid start x-flip
 {0x2c, 0x04}, //Pre2 wid start no-flip
-{0x2d, 0x02}, //Pre2 wid start x-flip 
+{0x2d, 0x02}, //Pre2 wid start x-flip
 
 {0x40, 0x01}, //Hblank_260
 {0x41, 0x04},
@@ -469,7 +469,7 @@ static struct msm_camera_i2c_reg_conf hi258_recommend_settings[] = {
 {0x8e, 0x80}, //Pga Blc Hold
 
 {0x90, 0x0a}, //BLC_TIME_TH_ON
-{0x91, 0x0a}, //BLC_TIME_TH_OFF 
+{0x91, 0x0a}, //BLC_TIME_TH_OFF
 {0x92, 0x98}, //BLC_AG_TH_ON
 {0x93, 0x90}, //BLC_AG_TH_OFF
 
@@ -526,7 +526,7 @@ static struct msm_camera_i2c_reg_conf hi258_recommend_settings[] = {
 {0x3d, 0x03},
 {0x3f, 0x02},
 
-{0x49, 0xc1},//20130604 0x87->0xd1 --> mode Change Issue modify -> 0xc1 
+{0x49, 0xc1},//20130604 0x87->0xd1 --> mode Change Issue modify -> 0xc1
 {0x4a, 0x10},
 
 {0x50, 0x21},
@@ -600,7 +600,7 @@ static struct msm_camera_i2c_reg_conf hi258_recommend_settings[] = {
 {0xd2, 0x20},
 {0xd3, 0x00},
 {0xd4, 0x0a}, //DCDC_TIME_TH_ON
-{0xd5, 0x0a}, //DCDC_TIME_TH_OFF 
+{0xd5, 0x0a}, //DCDC_TIME_TH_OFF
 {0xd6, 0x98}, //DCDC_AG_TH_ON
 {0xd7, 0x90}, //DCDC_AG_TH_OFF
 {0xdc, 0x00},
@@ -681,7 +681,7 @@ static struct msm_camera_i2c_reg_conf hi258_recommend_settings[] = {
 {0x2b, 0x30},
 {0x2c, 0x32},
 
-//GBGR 
+//GBGR
 {0x70, 0x2b},
 {0x74, 0x30},
 {0x75, 0x18},
@@ -780,7 +780,7 @@ static struct msm_camera_i2c_reg_conf hi258_recommend_settings[] = {
 {0x94, 0x02}, //Sharp2D HiClip1 Th
 {0x95, 0xf0}, //Sharp2D HiClip2 Th
 {0x96, 0x1e}, //Sharp2D HiClip2 Resolution
-{0x97, 0x40}, 
+{0x97, 0x40},
 {0x98, 0x80},
 {0x99, 0x40},
 
@@ -836,7 +836,7 @@ static struct msm_camera_i2c_reg_conf hi258_recommend_settings[] = {
 
 {0x03, 0x15}, //15 Page
 {0x10, 0x0f},
-{0x14, 0x42},	//CMCOFSGH 
+{0x14, 0x42},	//CMCOFSGH
 {0x15, 0x32},	//CMCOFSGM
 {0x16, 0x24},	//CMCOFSGL
 {0x17, 0x2f},	//CMC SIGN
@@ -845,11 +845,11 @@ static struct msm_camera_i2c_reg_conf hi258_recommend_settings[] = {
 {0x31, 0x59},
 {0x32, 0x0a},
 {0x33, 0x15},
-{0x34, 0x5b}, 
-{0x35, 0x06}, 
-{0x36, 0x07}, 
-{0x37, 0x40}, 
-{0x38, 0x87},			   
+{0x34, 0x5b},
+{0x35, 0x06},
+{0x36, 0x07},
+{0x37, 0x40},
+{0x38, 0x87},
 //CMC OFS
 {0x40, 0x92},
 {0x41, 0x1b},
@@ -1098,7 +1098,7 @@ static struct msm_camera_i2c_reg_conf hi258_recommend_settings[] = {
 {0x2b, 0x04}, //Adaptive Off,1/100 Flicker
 
 {0x2c, 0x83}, //AE After CI
-{0x2d, 0xe3}, 
+{0x2d, 0xe3},
 {0x2e, 0x13},
 {0x2f, 0x0b},
 
@@ -1154,27 +1154,27 @@ static struct msm_camera_i2c_reg_conf hi258_recommend_settings[] = {
 
 {0x03, 0x20}, //Page 20
 
-{0x83, 0x0a}, //EXP Normal 11 fps 
-{0x84, 0xe8}, 
-{0x85, 0xe2}, 
+{0x83, 0x0a}, //EXP Normal 11 fps
+{0x84, 0xe8},
+{0x85, 0xe2},
 {0x86, 0x01}, //EXPMin 13800.42 fps
-{0x87, 0xd7}, 
-{0x88, 0x0a}, //EXP Max 60hz 11 fps 
-{0x89, 0xbe}, 
-{0x8a, 0x91}, 
-{0xa5, 0x0a}, //EXP Max 50hz 11 fps 
-{0xa6, 0xe8}, 
-{0xa7, 0xe2}, 
-{0x8B, 0xfd}, //EXP100 
-{0x8C, 0xe6}, 
-{0x8D, 0xd3}, //EXP120 
-{0x8E, 0x95}, 
-{0x9c, 0x17}, //EXP Limit 1061.57 fps 
-{0x9d, 0xeb}, 
-{0x9e, 0x01}, //EXP Unit 
-{0x9f, 0xd7}, 
-{0xa3, 0x00}, //Outdoor Int 
-{0xa4, 0xd3}, 
+{0x87, 0xd7},
+{0x88, 0x0a}, //EXP Max 60hz 11 fps
+{0x89, 0xbe},
+{0x8a, 0x91},
+{0xa5, 0x0a}, //EXP Max 50hz 11 fps
+{0xa6, 0xe8},
+{0xa7, 0xe2},
+{0x8B, 0xfd}, //EXP100
+{0x8C, 0xe6},
+{0x8D, 0xd3}, //EXP120
+{0x8E, 0x95},
+{0x9c, 0x17}, //EXP Limit 1061.57 fps
+{0x9d, 0xeb},
+{0x9e, 0x01}, //EXP Unit
+{0x9f, 0xd7},
+{0xa3, 0x00}, //Outdoor Int
+{0xa4, 0xd3},
 
 
 {0xb0, 0x80},
@@ -1375,7 +1375,7 @@ static struct msm_camera_i2c_reg_conf hi258_recommend_settings[] = {
 //// MIPI Setting /////
 {0x03, 0x48},
 {0x39, 0x4f}, //lvds_bias_ctl    [2:0]mipi_tx_bias   [4:3]mipi_vlp_sel   [6:5]mipi_vcm_sel
-{0x10, 0x1c}, //lvds_ctl_1       [5]mipi_pad_disable [4]lvds_en [0]serial_data_len 
+{0x10, 0x1c}, //lvds_ctl_1       [5]mipi_pad_disable [4]lvds_en [0]serial_data_len
 {0x11, 0x00}, //lvds_ctl_2       [4]mipi continous mode setting
 //{0x14, 0x00} //ser_out_ctl_1  [2:0]serial_sout_a_phase   [6:4]serial_cout_a_phase
 
@@ -1398,7 +1398,7 @@ static struct msm_camera_i2c_reg_conf hi258_recommend_settings[] = {
 {0x1e, 0x06}, //hs_zero_time
 {0x1f, 0x09}, //hs_trail_time
 
-//long_packet word count 
+//long_packet word count
 {0x30, 0x0c},
 {0x31, 0x80}, //long_packet word count
 
@@ -1754,7 +1754,7 @@ static struct msm_camera_i2c_reg_conf HI258_reg_effect_normal[] = {
 	{0x11, 0x03},
     {0x12, 0xf0},
     {0x13, 0x03},
-  	{0x42, 0x08},  
+  	{0x42, 0x08},
 	{0x44, 0x80},
 	{0x45, 0x80},
 };
@@ -1887,7 +1887,7 @@ static struct msm_camera_i2c_reg_conf HI258_reg_wb_office[] = {
 
     {0x10, 0xfd},
 
-	
+
 };
 
 static struct msm_camera_i2c_reg_conf HI258_reg_wb_home[] = {
@@ -1912,7 +1912,7 @@ static int32_t msm_hi258_i2c_probe(struct i2c_client *client,
 	   const struct i2c_device_id *id)
 {
 	int rc;
-	rc = msm_sensor_i2c_probe(client, id, &hi258_s_ctrl);	
+	rc = msm_sensor_i2c_probe(client, id, &hi258_s_ctrl);
 	CDBG("%s:%d\n", __func__, __LINE__);
 //	if(rc==0)
 //	{
@@ -2001,10 +2001,10 @@ static uint32_t hi258_get_exp(struct msm_sensor_ctrl_t *s_ctrl)
 	rc = s_ctrl->sensor_i2c_client->i2c_func_tbl->
 			i2c_read(s_ctrl->sensor_i2c_client, 0x2082, &reg_82, MSM_CAMERA_I2C_BYTE_DATA);
 	//CDBG("%s zhangkw 80=0x%x 81=0x%x, 82=0x%x\n", __func__, reg_80, reg_81, reg_82);
-	
+
 	exp = (reg_80 << 8) |reg_81;
 	exp = (exp << 8) | reg_82;
-	
+
 	val = exp ; //* 4 /26000000;
 	CDBG("%s exp=0x%x\n", __func__, exp);
 	return val;
@@ -2024,7 +2024,7 @@ static uint32_t hi258_get_iso(struct msm_sensor_ctrl_t *s_ctrl)
 	rc = s_ctrl->sensor_i2c_client->i2c_func_tbl->
 			i2c_read(s_ctrl->sensor_i2c_client, 0x20b1, &reg_b1, MSM_CAMERA_I2C_BYTE_DATA);
 	//reg_b1 = 0x14;
-	
+
 	val = reg_b0 * 100 /reg_b1;
 	CDBG("%s b0=0x%x b1=0x%x  val=%d\n", __func__, reg_b0, reg_b1, val);
 	return val;
@@ -2042,7 +2042,7 @@ static int32_t hi258_sensor_power_down(struct msm_sensor_ctrl_t *s_ctrl)
 static int32_t hi258_platform_probe(struct platform_device *pdev)
 {
 	int32_t rc;
-	const struct of_device_id *match;	
+	const struct of_device_id *match;
 	CDBG("%s:%d\n", __func__, __LINE__);
 	match = of_match_device(hi258_dt_match, &pdev->dev);
 	rc = msm_sensor_platform_probe(pdev, match->data);
@@ -2058,7 +2058,7 @@ static int __init hi258_init_module(void)
 
 	int32_t rc;
 	CDBG("%s:%d\n", __func__, __LINE__);
-	
+
 	rc = platform_driver_probe(&hi258_platform_driver,
 		hi258_platform_probe);
 	if (!rc)
@@ -2190,7 +2190,7 @@ static void hi258_set_scene_mode(struct msm_sensor_ctrl_t *s_ctrl, int value)
 			ARRAY_SIZE(HI258_reg_scene_auto));
 		break;
 	}
-	case MSM_CAMERA_SCENE_MODE_NIGHT: 
+	case MSM_CAMERA_SCENE_MODE_NIGHT:
 	case MSM_CAMERA_SCENE_MODE_NIGHT_PORTRAIT:
 	{
 		hi258_i2c_write_table(s_ctrl, &HI258_reg_scene_night[0],
@@ -2301,10 +2301,10 @@ int32_t hi258_sensor_config(struct msm_sensor_ctrl_t *s_ctrl,
 		else if(2==val)
 			{
 			hi258_i2c_write_table(s_ctrl, &hi258_480p_settings[0],
-				ARRAY_SIZE(hi258_480p_settings));		
+				ARRAY_SIZE(hi258_480p_settings));
 			}
 		CDBG("svga/xvga/vga setting %d X",val);
-		
+
 		break;
 	}
 	case CFG_SET_STOP_STREAM:
@@ -2666,11 +2666,11 @@ int32_t hi258_sensor_config(struct msm_sensor_ctrl_t *s_ctrl,
 	case CFG_GET_YUV_INFO: {
 		cdata->cfg.yuv_info.exp_time= hi258_get_exp(s_ctrl);
 		cdata->cfg.yuv_info.iso= hi258_get_iso(s_ctrl);
-		CDBG("%s exp=%d, iso=%d\n", __func__, 
+		CDBG("%s exp=%d, iso=%d\n", __func__,
 			cdata->cfg.yuv_info.exp_time, cdata->cfg.yuv_info.iso);
 		break;
-	}	
-#endif	
+	}
+#endif
 	default:
 		rc = -EFAULT;
 		break;

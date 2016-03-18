@@ -821,25 +821,3 @@ void rmidev_remove_device(void)
 	return;
 }
 
-/*
-static int __init rmidev_module_init(void)
-{
-	rmidev_init_device();
-
-	return 0;
-}
-
-static void __exit rmidev_module_exit(void)
-{
-	rmidev_remove_device();
-	
-	return;
-}
-module_init(rmidev_module_init);
-module_exit(rmidev_module_exit);
-
-MODULE_AUTHOR("Synaptics, Inc.");
-MODULE_DESCRIPTION("Synaptics DSX RMI Dev Module");
-MODULE_LICENSE("GPL v2");
-*/
-

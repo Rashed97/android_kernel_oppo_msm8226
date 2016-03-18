@@ -138,9 +138,7 @@ static void mainboard_verify(void)
 		 printk(KERN_ERR "%s:gpio_tlmm_config(%#x)=%d\n",
 			 __func__, PN544_VEN, ret);
 	 }
-	 
-	 //gpio_set_value(APQ_NFC_VEN_GPIO, 0);
-	 //msleep(50);
+
 	 gpio_set_value(APQ_NFC_VEN_GPIO, 1);
 	 msleep(100);
 
@@ -151,9 +149,6 @@ static void mainboard_verify(void)
 			  __func__, PN544_FIRM, ret);
 	  }
 	  gpio_set_value(APQ_NFC_FIRM_GPIO, 0);
-#if 0	  
-	  printk(KERN_ERR "%s:liuhd for nfc gpio---\n",__func__);
-#endif
 
  }
 /*OPPO yuyi 2013-03-22 yuyi add end*/
@@ -183,9 +178,6 @@ static irqreturn_t pn544_dev_irq_handler(int irq, void *dev_id)
 
 	pn544_disable_irq(pn544_dev);
 /* OPPO 2012-08-13 liuhd Modify begin for nfc */
-#if 0
-	printk("yuyi pn544 irq working\n");
-#endif
 	/* Wake up waiting readers */
 	wake_up(&pn544_dev->read_wq);
 
@@ -199,12 +191,6 @@ static ssize_t pn544_dev_read(struct file *filp, char __user *buf, size_t count,
 	int ret;
 	if (count > MAX_BUFFER_SIZE)
 		count = MAX_BUFFER_SIZE;
-
-/* OPPO 2012-08-13 liuhd Delete begin for nfc */
-#if 0 
-	printk("%s : reading %zu bytes.\n", __func__, count);
-#endif
-/* OPPO 2012-08-13 liuhd Delete end */
 
 	mutex_lock(&pn544_dev->read_mutex);
 
@@ -250,14 +236,6 @@ static ssize_t pn544_dev_read(struct file *filp, char __user *buf, size_t count,
 	}
 	
 /* OPPO 2012-08-13 liuhd Delete begin for nfc */
-#if 0
-	printk("IFD->PC:");
-	for(i = 0; i < ret; i++)
-	{
-		printk(" %02X", tmp[i]);
-	}
-	printk("\n");
-#endif
 /* OPPO 2012-08-13 liuhd Delete end */
 	
 	return ret;
@@ -285,12 +263,6 @@ static ssize_t pn544_dev_write(struct file *filp, const char __user *buf, size_t
 		return -EFAULT;
 	}
 
-/* OPPO 2012-08-13 liuhd Delete begin for nfc */
-#if 0
-	printk("%s : writing %zu bytes.\n", __func__, count);
-#endif
-/* OPPO 2012-08-13 liuhd Delete end */
-	
 	/* Write data */
 	ret = i2c_master_send(pn544_dev->client, tmp, count);
 	if (ret != count) 
@@ -301,18 +273,7 @@ static ssize_t pn544_dev_write(struct file *filp, const char __user *buf, size_t
 	
 	/* pn544 seems to be slow in handling I2C write requests
 	 * so add 1ms delay after I2C send oparation */
-	
-/* OPPO 2012-08-13 liuhd Delete begin for nfc */
-#if 0 
-	printk("PC->IFD:");
-	for(i = 0; i < count; i++)
-	{
-		printk(" %02X", tmp[i]);
-	}
-	printk("\n");
-#endif
-/* OPPO 2012-08-13 liuhd Delete end */
-	
+
 	return ret;
 }
 

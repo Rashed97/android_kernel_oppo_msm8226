@@ -483,7 +483,6 @@ config ARCH_MSM8610
 #endif /* VENDOR_EDIT */
 
 #ifdef VENDOR_EDIT
-#boning.li@Prd.framework, 2014/2/24, Add for device selection
 	config OPPO_MSM_13096
 	bool "OPPO_MSM_13096"
 #endif /* VENDOR_EDIT */

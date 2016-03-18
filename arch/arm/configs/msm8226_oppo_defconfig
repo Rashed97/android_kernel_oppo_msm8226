@@ -538,10 +538,7 @@ CONFIG_SYNAPTIC_OPPO13095=y
 CONFIG_OPPO_SMB358=y
 CONFIG_FB_MSM_MDSS_DSI_CTRL_STATUS=y
 # endif /*VENDOR_EDIT*/
-# ifdef VENDOR_EDIT //yixue.ge@BSP.Driver, 2014/04/15, Add for exfat filesystem
 CONFIG_NLS_UTF8=y
-CONFIG_EXFAT_FS=y
-# endif
 #ifdef VENDOR_EDIT
 #//ye.zhang@ProDrv.Sen, 2014-1-8,add for hall sensor
 CONFIG_HALL=y

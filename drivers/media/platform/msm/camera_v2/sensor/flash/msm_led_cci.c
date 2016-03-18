@@ -19,13 +19,13 @@
 #define pr_fmt(fmt) "%s:%d " fmt, __func__, __LINE__
 
 #include "msm_led_cci.h"
+#include <linux/proc_fs.h>
 
 #define FLASH_NAME "camera-led-flash"
 
 #undef CDBG
 #undef CONFIG_MSMB_CAMERA_DEBUG
 
-//lxl add 
 #ifndef CONFIG_MSMB_CAMERA_DEBUG
 #define CONFIG_MSMB_CAMERA_DEBUG
 #endif
@@ -45,164 +45,9 @@ static struct msm_camera_i2c_fn_t msm_led_cci_i2c_func_tbl = {
 	.i2c_write = msm_camera_cci_i2c_write,
 	.i2c_write_table = msm_camera_cci_i2c_write_table,
 	.i2c_write_seq_table = msm_camera_cci_i2c_write_seq_table,
-	.i2c_write_table_w_microdelay =
-		msm_camera_cci_i2c_write_table_w_microdelay,
+	.i2c_write_table_w_microdelay =	msm_camera_cci_i2c_write_table_w_microdelay,
 	.i2c_util = msm_sensor_cci_i2c_util,
 };
-
-// guanjd@camtdt modify
-static struct msm_camera_i2c_reg_array adp1650_init_array[] = {
-	{0x04, 0xa4},
-	//{0x0f, 0x00},
-};
-
-static struct msm_camera_i2c_reg_array adp1650_off_array[] = {
-	{0x04, 0xa4},
-};
-
-static struct msm_camera_i2c_reg_array adp1650_release_array[] = {
-	{0x04, 0xa4},
-	//{0x0f, 0x00},
-};
-
-static struct msm_camera_i2c_reg_array adp1650_low_array[] = {
-	{0x03, 0x03},  //torch 100ma
-	{0x04, 0xae},  //set torch mode
-};
-
-static struct msm_camera_i2c_reg_array adp1650_high_array[] = {
-	//{0x03, 0x48},  //flash 750ma
-	{0x03, 0x70},  //flash 1A
-	{0x04, 0xaf},  //set flash mode
-};
-
-static struct msm_camera_i2c_reg_setting adp1650_init_setting = {
-	.reg_setting = adp1650_init_array,
-	.size = ARRAY_SIZE(adp1650_init_array),
-	.addr_type = MSM_CAMERA_I2C_BYTE_ADDR,
-	.data_type = MSM_CAMERA_I2C_BYTE_DATA,
-	.delay = 0,
-};
-
-static struct msm_camera_i2c_reg_setting adp1650_off_setting = {
-	.reg_setting = adp1650_off_array,
-	.size = ARRAY_SIZE(adp1650_off_array),
-	.addr_type = MSM_CAMERA_I2C_BYTE_ADDR,
-	.data_type = MSM_CAMERA_I2C_BYTE_DATA,
-	.delay = 0,
-};
-
-static struct msm_camera_i2c_reg_setting adp1650_release_setting = {
-	.reg_setting = adp1650_release_array,
-	.size = ARRAY_SIZE(adp1650_release_array),
-	.addr_type = MSM_CAMERA_I2C_BYTE_ADDR,
-	.data_type = MSM_CAMERA_I2C_BYTE_DATA,
-	.delay = 0,
-};
-
-static struct msm_camera_i2c_reg_setting adp1650_low_setting = {
-	.reg_setting = adp1650_low_array,
-	.size = ARRAY_SIZE(adp1650_low_array),
-	.addr_type = MSM_CAMERA_I2C_BYTE_ADDR,
-	.data_type = MSM_CAMERA_I2C_BYTE_DATA,
-	.delay = 0,
-};
-
-static struct msm_camera_i2c_reg_setting adp1650_high_setting = {
-	.reg_setting = adp1650_high_array,
-	.size = ARRAY_SIZE(adp1650_high_array),
-	.addr_type = MSM_CAMERA_I2C_BYTE_ADDR,
-	.data_type = MSM_CAMERA_I2C_BYTE_DATA,
-	.delay = 0,
-};
-
-static struct msm_led_cci_reg_t adp1650_regs = {
-	.init_setting = &adp1650_init_setting,
-	.off_setting = &adp1650_off_setting,
-	.low_setting = &adp1650_low_setting,
-	.high_setting = &adp1650_high_setting,
-	.release_setting = &adp1650_release_setting,
-};
-
-static struct msm_camera_i2c_reg_array lm3642_init_array[] = {
-	{0x0a, 0x00},
-	//{0x0f, 0x00},
-};
-
-static struct msm_camera_i2c_reg_array lm3642_off_array[] = {
-	{0x0a, 0x00},
-};
-
-static struct msm_camera_i2c_reg_array lm3642_release_array[] = {
-	{0x0a, 0x00},
-	//{0x0f, 0x00},
-};
-
-static struct msm_camera_i2c_reg_array lm3642_low_array[] = {
-	//{0x09, 0x10},  //torch 100ma
-	//{0x0a, 0x02},  //set torch mode
-	{0x09, 0x10},  //Torch current 93.74mA				
-	{0x06, 0x00},  //Torch Ramp-Up/Down Time				
-	{0x0A, 0x12}, //Torch mode enable
-};
-
-static struct msm_camera_i2c_reg_array lm3642_high_array[] = {
-	
-	//{0x09, 0x0a},  //flash 1A
-	//{0x0a, 0x03},  //set flash mode
-	{0x09, 0x0A},  //flash 1A
-	{0x08, 0x57}, 
-	{0x0A, 0x23},
-};
-
-static struct msm_camera_i2c_reg_setting lm3642_init_setting = {
-	.reg_setting = lm3642_init_array,
-	.size = ARRAY_SIZE(lm3642_init_array),
-	.addr_type = MSM_CAMERA_I2C_BYTE_ADDR,
-	.data_type = MSM_CAMERA_I2C_BYTE_DATA,
-	.delay = 0,
-};
-
-static struct msm_camera_i2c_reg_setting lm3642_off_setting = {
-	.reg_setting = lm3642_off_array,
-	.size = ARRAY_SIZE(lm3642_off_array),
-	.addr_type = MSM_CAMERA_I2C_BYTE_ADDR,
-	.data_type = MSM_CAMERA_I2C_BYTE_DATA,
-	.delay = 0,
-};
-
-static struct msm_camera_i2c_reg_setting lm3642_release_setting = {
-	.reg_setting = lm3642_release_array,
-	.size = ARRAY_SIZE(lm3642_release_array),
-	.addr_type = MSM_CAMERA_I2C_BYTE_ADDR,
-	.data_type = MSM_CAMERA_I2C_BYTE_DATA,
-	.delay = 0,
-};
-
-static struct msm_camera_i2c_reg_setting lm3642_low_setting = {
-	.reg_setting = lm3642_low_array,
-	.size = ARRAY_SIZE(lm3642_low_array),
-	.addr_type = MSM_CAMERA_I2C_BYTE_ADDR,
-	.data_type = MSM_CAMERA_I2C_BYTE_DATA,
-	.delay = 0,
-};
-
-static struct msm_camera_i2c_reg_setting lm3642_high_setting = {
-	.reg_setting = lm3642_high_array,
-	.size = ARRAY_SIZE(lm3642_high_array),
-	.addr_type = MSM_CAMERA_I2C_BYTE_ADDR,
-	.data_type = MSM_CAMERA_I2C_BYTE_DATA,
-	.delay = 0,
-};
-
-static struct msm_led_cci_reg_t lm3642_regs = {
-	.init_setting = &lm3642_init_setting,
-	.off_setting = &lm3642_off_setting,
-	.low_setting = &lm3642_low_setting,
-	.high_setting = &lm3642_high_setting,
-	.release_setting = &lm3642_release_setting,
-};
-
 
 static int32_t msm_led_cci_get_subdev_id(struct msm_led_cci_ctrl_t *fctrl,
 	void *arg)
@@ -221,7 +66,6 @@ static void msm_led_cci_set_brightness(struct msm_led_cci_ctrl_t *fctrl,
 				      enum msm_camera_led_config_t cfgtype)
 {
     int rc = 0;
-    //uint16_t reg_val = 0;
     struct msm_camera_i2c_client *i2c_client = NULL;
     struct msm_led_cci_led_info_t *led_info = NULL;
 
@@ -238,7 +82,6 @@ static void msm_led_cci_set_brightness(struct msm_led_cci_ctrl_t *fctrl,
         pr_err("null i2c_client or led_info\n");
         return;
     }
-
 
     switch (cfgtype) {
     case MSM_CAMERA_LED_INIT:
@@ -259,11 +102,6 @@ static void msm_led_cci_set_brightness(struct msm_led_cci_ctrl_t *fctrl,
         rc = gpio_direction_output(fctrl->led_info->gpio_strobe_en, 0);
         if (rc < 0)
             pr_err("set gpio to 0 failed\n");
-
-        /*init array*/
-        /*rc = i2c_client->i2c_func_tbl->i2c_write_table(i2c_client, fctrl->reg_setting->init_setting);
-        if (rc < 0)
-            pr_err("MSM_CAMERA_LED_INIT failed\n");*/
 
         break;
 
@@ -286,17 +124,6 @@ static void msm_led_cci_set_brightness(struct msm_led_cci_ctrl_t *fctrl,
         break;
 
     case MSM_CAMERA_LED_OFF:
-        #if 0  //not read fault_info_reg
-        /*read fault reg*/
-        rc = i2c_client->i2c_func_tbl->i2c_read(i2c_client, led_info->fault_info_reg,
-            &reg_val, MSM_CAMERA_I2C_BYTE_DATA);
-        if (rc < 0) {
-            pr_err("cci read failed\n");
-        } else {
-            if (reg_val)
-                pr_err("fault occured, reg value is 0x%X\n", reg_val);
-        }
-        #endif
         /*write off reg*/
         rc = i2c_client->i2c_func_tbl->i2c_write_table(i2c_client, fctrl->reg_setting->off_setting);
         if (rc < 0)
@@ -492,13 +319,7 @@ static int32_t msm_led_cci_get_dt_led_data(struct msm_led_cci_ctrl_t *fctrl,
 	if (rc < 0) {
 		pr_err("failed of_property_read\n");
 	}
-      /*
-      rc = of_property_read_u32(of_node,
-		"qcom,gpio-torch-en", &led_info->gpio_torch_en);
-	if (rc < 0) {
-		pr_err("failed of_property_read\n");
-	}
-	*/
+
 	rc = of_property_read_u32(of_node,
 		"qcom,gpio-strobe-en", &led_info->gpio_strobe_en);
 	if (rc < 0) {
@@ -513,7 +334,7 @@ static int32_t msm_led_cci_get_dt_led_data(struct msm_led_cci_ctrl_t *fctrl,
 
       CDBG("name is %s, regulator name %s, gpio en-%d strobe-%d\n",
           led_info->name, led_info->regulator_name, led_info->gpio_en, led_info->gpio_strobe_en);
-  
+
       fctrl->led_info = led_info;
 
       return 0;
@@ -556,13 +377,6 @@ static int32_t msm_led_cci_query_ic(struct msm_led_cci_ctrl_t *fctrl, struct dev
         }
         of_node_put(flash_src_node);
 
-    #if 0  //not read id when proble
-        /*init cci*/
-        fctrl->flash_i2c_client->cci_client->sid = fctrl->led_info->slave_id;
-        fctrl->flash_i2c_client->cci_client->cci_i2c_master = fctrl->led_info->cci_master;   
-        matched = true;
-	  ret = 0;
-    #else
         /*get power*/
         cci_regulator = regulator_get(&fctrl->pdev->dev, fctrl->led_info->regulator_name);
         if (IS_ERR_OR_NULL(cci_regulator)) {
@@ -570,8 +384,6 @@ static int32_t msm_led_cci_query_ic(struct msm_led_cci_ctrl_t *fctrl, struct dev
             goto FAILED;
         }
         /*enable power*/
-		#ifdef VENDOR_EDIT
-		//guanjd add for cci power
 		rc = regulator_set_voltage(
 				cci_regulator,1800000,
 				1900000);
@@ -580,10 +392,9 @@ static int32_t msm_led_cci_query_ic(struct msm_led_cci_ctrl_t *fctrl, struct dev
 			if (rc < 0) {
 				pr_err("%s: %s set voltage failed\n",
 					__func__, fctrl->led_info->regulator_name);
-				
+
 			}
-		#endif
-		
+
         rc = regulator_enable(cci_regulator);
         if (rc < 0) {
             pr_err("regulator_enable failed\n");
@@ -598,7 +409,7 @@ static int32_t msm_led_cci_query_ic(struct msm_led_cci_ctrl_t *fctrl, struct dev
         rc = gpio_direction_output(fctrl->led_info->gpio_en, 1);
         if (rc < 0)
             pr_err("set gpio to 1 failed\n");
-        
+
         /*init cci*/
         fctrl->flash_i2c_client->cci_client->sid = fctrl->led_info->slave_id;
         fctrl->flash_i2c_client->cci_client->cci_i2c_master =
@@ -671,7 +482,7 @@ static int32_t msm_led_cci_query_ic(struct msm_led_cci_ctrl_t *fctrl, struct dev
             gpio_free(fctrl->led_info->gpio_en);
         else
             pr_err("set gpio to 0 failed\n");
-        
+
     	/*disable power*/
         rc = regulator_disable(cci_regulator);
         if (rc < 0) {
@@ -680,7 +491,6 @@ static int32_t msm_led_cci_query_ic(struct msm_led_cci_ctrl_t *fctrl, struct dev
             goto FAILED;
         }
         regulator_put(cci_regulator);
-    #endif
     }
 
     return ret;
@@ -717,7 +527,7 @@ static void msm_led_cci_test_init(void)
     }
 
     msm_led_cci_set_brightness(&fctrl, MSM_CAMERA_LED_INIT);
-    
+
     /*init cci*/
     fctrl.flash_i2c_client->cci_client->sid = fctrl.led_info->slave_id;
     fctrl.flash_i2c_client->cci_client->cci_i2c_master =
@@ -736,7 +546,6 @@ static void msm_led_cci_test_off(void)
 {
     int rc;
 
-    //fctrl.led_info->status = MSM_CAMERA_LED_OFF;
     if (fctrl.led_info->test_mode == 2) {
         cancel_delayed_work_sync(&fctrl.led_info->dwork);
     }
@@ -748,7 +557,7 @@ static void msm_led_cci_test_off(void)
     if (rc < 0) {
         pr_err("cci release failed\n");
     }
-    
+
     msm_led_cci_set_brightness(&fctrl, MSM_CAMERA_LED_RELEASE);
 
     /*disable power*/
@@ -824,20 +633,18 @@ static ssize_t msm_led_cci_test_store(struct device *dev, struct device_attribut
         pr_err("invalid mode\n");
         break;
     }
-	
+
 	return count;
 }
 
 static DEVICE_ATTR(test, 0660,
 		   NULL, msm_led_cci_test_store);
 
-#ifdef VENDOR_EDIT
 //LiuBin@Camera, 2014/04/14, Add proc for flash test
-#include <linux/proc_fs.h>
 static int flash_proc_read(char *page, char **start, off_t off, int count,
    int *eof, void *data)
 {
-	
+
 	int len = 0;
 
 	if (fctrl.led_info == NULL)
@@ -845,7 +652,7 @@ static int flash_proc_read(char *page, char **start, off_t off, int count,
 		pr_err("led_info is NULL \n");
 		return 0;
 	}
-	
+
 	len = sprintf(page, fctrl.led_info->name);
 	if (len <= off+count)
 		*eof = 1;
@@ -863,7 +670,7 @@ static int flash_proc_write(struct file *filp, const char __user *buff,
 {
 	char buf[8] = {0};
 	int new_mode = 0;
-	
+
     int *pold_mode = &fctrl.led_info->test_mode;
 
 	if (len > 8)
@@ -879,7 +686,7 @@ static int flash_proc_write(struct file *filp, const char __user *buff,
         pr_err("the same mode as old\n");
         return len;
     }
-	
+
 	switch (new_mode) {
     case 0:
         if (*pold_mode==1 || *pold_mode==2 || *pold_mode==3) {
@@ -917,14 +724,14 @@ static int flash_proc_write(struct file *filp, const char __user *buff,
         pr_err("invalid mode\n");
         break;
     }
-	
+
 	return len;
 }
 
 static int flash_proc_init(struct msm_led_cci_ctrl_t *flash_ctl)
 {
 	int ret=0;
-	
+
 	struct proc_dir_entry *proc_entry = create_proc_entry( "qcom_flash", 0666, NULL);
 
 	if (proc_entry == NULL)
@@ -939,10 +746,9 @@ static int flash_proc_init(struct msm_led_cci_ctrl_t *flash_ctl)
 		proc_entry->write_proc = flash_proc_write;
 		pr_err("[%s]: create qcom_flash proc success \n", __func__);
 	}
-	
+
 	return ret;
 }
-#endif /* VENDOR_EDIT */
 
 static struct attribute *msm_led_cci_attributes[] = {
         &dev_attr_test.attr,
@@ -990,14 +796,14 @@ static int32_t msm_led_cci_probe(struct platform_device *pdev)
         pr_err("failed no memory\n");
         return -ENOMEM;
     }
-    
+
     fctrl.flash_i2c_client->cci_client = kzalloc(sizeof(
         struct msm_camera_cci_client), GFP_KERNEL);
     if (!fctrl.flash_i2c_client->cci_client) {
         pr_err("failed no memory\n");
         return -ENOMEM;
     }
-        
+
     fctrl.flash_i2c_client->cci_client->cci_subdev = msm_cci_get_subdev();
     fctrl.flash_i2c_client->cci_client->retries = 2;
     fctrl.flash_i2c_client->cci_client->id_map = 0;
@@ -1010,29 +816,17 @@ static int32_t msm_led_cci_probe(struct platform_device *pdev)
         return -ENODEV;
     }
 
-//zhaozhengtao modify for 13095 and 14029 exteral led driver 
-    if (!strcmp(fctrl.led_info->name, "lm3642")) {
-        fctrl.reg_setting = &lm3642_regs;
-        pr_err("find a device lm3642");	
-    } 
-    else if(!strcmp(fctrl.led_info->name, "adp1650")) {
-        fctrl.reg_setting = &adp1650_regs;
-        pr_err("find a device adp1650");		
-    } else {
         pr_err("can't find a known chip\n");
         return -ENODEV;
-    }   
+
     rc = msm_led_cci_create_v4lsubdev(pdev, &fctrl);
 
     if (rc >= 0)
         rc = sysfs_create_group(&pdev->dev.kobj, &msm_led_cci_attr_group);
 
-#ifdef VENDOR_EDIT
-//LiuBin@MtkCamera, 2014/04/14, Add for flash proc
 	if (rc >= 0)
     	flash_proc_init(&fctrl);
-#endif /* VENDOR_EDIT */
-	
+
     return rc;
 }
 
@@ -1055,4 +849,3 @@ static struct msm_led_cci_ctrl_t fctrl = {
 module_init(msm_led_cci_add_driver);
 MODULE_DESCRIPTION("LED TRIGGER FLASH");
 MODULE_LICENSE("GPL v2");
-

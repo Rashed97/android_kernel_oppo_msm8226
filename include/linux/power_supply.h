@@ -32,7 +32,6 @@ struct device;
  * space. Unused/unknown fields will not appear in sysfs.
  */
 
-//#ifdef VENDOR_EDIT
 enum smb358_chg_temp{
 	SMB358_CHG_TEMP_PRESENT = 0,
 	SMB358_CHG_TEMP_COLD,
@@ -49,7 +48,6 @@ enum smb358_charge_timeout{
 	TIME_1527MIN,
 	TIME_DISABLED,
 };
-//#endif
 
 enum {
 	POWER_SUPPLY_STATUS_UNKNOWN = 0,
@@ -157,13 +155,11 @@ enum power_supply_property {
 	POWER_SUPPLY_PROP_SCOPE,
 	POWER_SUPPLY_PROP_SYSTEM_TEMP_LEVEL,
 	POWER_SUPPLY_PROP_RESISTANCE,
-	//#ifdef VENDOR_EDIT
 	POWER_SUPPLY_PROP_CHARGE_TIMEOUT,
 	POWER_SUPPLY_PROP_FAST_CHARGE,
 	POWER_SUPPLY_PROP_TEMP_STATU,
 	POWER_SUPPLY_PROP_USB_TYPE,
 	POWER_SUPPLY_PROP_BATTERY_REQUEST_POWEROFF,
-	//#endif
 	/* Properties of type `const char *' */
 	POWER_SUPPLY_PROP_MODEL_NAME,
 	POWER_SUPPLY_PROP_MANUFACTURER,

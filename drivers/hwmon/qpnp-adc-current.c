@@ -1388,7 +1388,7 @@ static int __devinit qpnp_iadc_probe(struct spmi_device *spmi)
 		pr_debug("Use internal RDS trim workaround\n");
 		iadc->rds_trim_default_check = true;
 	}
-	
+
 	iadc->vadc_dev = qpnp_get_vadc(&spmi->dev, "iadc");
 	if (IS_ERR(iadc->vadc_dev)) {
 		rc = PTR_ERR(iadc->vadc_dev);
@@ -1402,12 +1402,12 @@ static int __devinit qpnp_iadc_probe(struct spmi_device *spmi)
 	#ifdef VENDOR_EDIT//Fanhong.Kong@ProDrv.CHG,modified 2014.4.13 for 14027
 	if(is_project(OPPO_14013))
 	{
-		if(get_PCB_Version() == HW_VERSION__10){
-			rc = of_property_read_u32(node, "qcom,rsense_20",&iadc->rsense);
-			pr_err("qpnp_iadc_probe,20uohm\r\n");
-		}else{
-			rc = of_property_read_u32(node, "qcom,rsense",&iadc->rsense);
-				pr_err("qpnp_iadc_probe,10uohm\r\n");
+	if(get_PCB_Version() == HW_VERSION__10){
+	rc = of_property_read_u32(node, "qcom,rsense_20",&iadc->rsense);
+		pr_err("qpnp_iadc_probe,20uohm\r\n");
+	}else{
+                  rc = of_property_read_u32(node, "qcom,rsense",&iadc->rsense);
+			pr_err("qpnp_iadc_probe,10uohm\r\n");
 		}
 	}else {
 		rc = of_property_read_u32(node, "qcom,rsense",&iadc->rsense);

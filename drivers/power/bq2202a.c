@@ -1,15 +1,15 @@
 /************************************************************************************
-** File:  \\172.16.101.171\Linux_Samba\work\kongfanhong\14033\MSM8926.LA.1.0.0.1.101.1_DEV_ROM\android
-** VENDOR_EDIT
+** File:  bq2202a.c
+**
 ** Copyright (C), 2008-2012, OPPO Mobile Comm Corp., Ltd
-** 
-** Description: 
-**      for battery encryption  bq2202a
-** 
+**
+** Description:
+**      for battery authentication -  bq2202a
+**
 ** Version: 1.0
 ** Date created: 22:45:46,04/09/2014
 ** Author: Fanhong.Kong@ProDrv.CHG
-** 
+**
 ** --------------------------- Revision History: ------------------------------------------------------------
 ** 	<author>	<data>			<desc>
 ** 1.1          2014-4-19       Fanhong.Kong@ProDrv.CHG             qcom bq2202a ic
@@ -32,14 +32,12 @@
 #include <linux/of_gpio.h>
 #include <linux/mutex.h>
 #include <linux/qpnp/qpnp-adc.h>
-#include <mach/oppo_boot_mode.h>
-
 
 
 extern bool oppo_high_battery_status;
 extern int oppo_check_ID_status;
 
-#define DEBUG_BQ2202A           
+#define DEBUG_BQ2202A
 #define READ_PAGE_BQ2202A
 
 #define BQ2202A_GPIO 				53
@@ -50,24 +48,15 @@ extern int oppo_check_ID_status;
 
 #define READ_ID_CMD                 0x33            // read ROM
 #define SKIP_ROM_CMD               0xCC           // skip ROM
-#define WRITE_EPROM_CMD        0x0F           // write EPROM 
+#define WRITE_EPROM_CMD        0x0F           // write EPROM
 #define READ_PAGE_ID_CMD        0xF0          // read EPROM  PAGE
 #define READ_FIELD_ID_CMD       0xC3          // read EPROM  FIELD
 
-#ifdef READ_PAGE_BQ2202A
-#define AddressLow                     0x20        // EPROM start address LOW 
+#define AddressLow                     0x20        // EPROM start address LOW
 #define AddressHigh                     0x00        // EPROM start address  HIGH
-#else
-#define AddressLow                     0x00        // EPROM start address LOW 
-#define AddressHigh                     0x00        // EPROM start address  HIGH
-#endif
 
-static  unsigned char ReadIDDataByte[8];     //8*8=64bit            ID ROM 
-#ifdef READ_PAGE_BQ2202A
+static  unsigned char ReadIDDataByte[8];     //8*8=64bit            ID ROM
 static  unsigned char CheckIDDataByte[32];    // 32*8=256bit   EPROM  PAGE1
-#else
-static  unsigned char CheckIDDataByte[128];    // 128*8=1024bit   EPROM  PAGE1
-#endif
 
 static DEFINE_MUTEX(bq2202a_access);
 /**********************************************************************/
@@ -79,15 +68,8 @@ static DEFINE_MUTEX(bq2202a_access);
 /*	Global Variables:	None   										  */
 /*  Returns: 			None								          */
 /**********************************************************************/
-#if 0
-void wait_us(int usec)
-{
-    while (usec--);
-}
-#else
 #define wait_us(n) udelay(n)
 #define wait_ms(n) mdelay(n)
-#endif
 
 int Gpio_BatId_Init(void)
 {
@@ -95,7 +77,6 @@ int Gpio_BatId_Init(void)
 	if(gpio_is_valid(BQ2202A_GPIO))
 	{
 		rc = gpio_request(BQ2202A_GPIO,"batid_bq2202a");
-		//pr_err("Gpio_BatId_Init,gpio_request batid_bq2202a\r\n");
 		if(rc)
 		{
 			pr_err("unable to request gpio batid_bq2202a\r\n");
@@ -120,7 +101,7 @@ int Gpio_BatId_Init(void)
 /**********************************************************************/
 static void SendReset(void)
 {
-    
+
     gpio_direction_output(BQ2202A_GPIO, GPIO_DIR_OUT_1);	            //Set High
     wait_us(20);													//Allow PWR cap to charge and power IC	~ 25us
     gpio_direction_output(BQ2202A_GPIO, GPIO_DIR_OUT_0);           	//Set Low
@@ -149,32 +130,21 @@ static unsigned char TestPresence(void)
     gpio_direction_input(BQ2202A_GPIO);	        //Set GPIO P9.3 as Input
     PresenceTimer = 300;                                                //Set timeout, enough time to allow presence pulse
     GotPulse = 0;                                                           //Initialize as no pulse detected
-	wait_us(60);	
-    while ((PresenceTimer > 0) && (GotPulse == 0)) 
+	wait_us(60);
+    while ((PresenceTimer > 0) && (GotPulse == 0))
     {
         InputData = gpio_get_value(BQ2202A_GPIO);       //Monitor logic state of GPIO
-		/*int j = 0;
-		while(j < 10) 
-		{
-			printk("mt_get_gpio_in---------------InputData = %d\r\n", InputData);
-			j++;
-			wait_us(100);
-			
-		}*/
         if (InputData == 0)                                             //If GPIO is Low,
-        {                           
+        {
             GotPulse = 1;                                               //it means that device responded
         }
-        else                                                                //If GPIO is high      
-        {                                          
+        else                                                                //If GPIO is high
+        {
             GotPulse = 0;			                            //it means that device has not responded
             --PresenceTimer;		                            //Decrease timeout until enough time has been allowed for response
         }
     }
     wait_us(200);					                    //Wait some time to continue SDQ communication
-    #ifdef DEBUG_BQ2202A
-    //printk("PresenceTimer=%d\n",PresenceTimer);
-    #endif
     return GotPulse;				                    //Return if device detected or not
 }
 
@@ -189,12 +159,8 @@ static unsigned char TestPresence(void)
 /**********************************************************************/
 static void WriteOneBit(unsigned char OneZero)
 {
-	//wait_us(300);
 	gpio_direction_output(BQ2202A_GPIO, GPIO_DIR_OUT_1);			//Set GPIO P9.3 as Output
-    //mt_set_gpio_out(BQ2202A_GPIO, 1);		            //Set High
      gpio_direction_output(BQ2202A_GPIO, GPIO_DIR_OUT_0);	                //Set Low
-    
-     //printk("WriteOneBit----1------OneZero = %d\t\n", OneZero);
     if (OneZero != 0x00)
     {
         wait_us(7);									//approximately 7us	for a Bit 1
@@ -202,7 +168,7 @@ static void WriteOneBit(unsigned char OneZero)
         wait_us(65);								//approximately 65us
     }
     else
-    { 
+    {
         wait_us(65);								//approximately 65us for a Bit 0
         gpio_direction_output(BQ2202A_GPIO, GPIO_DIR_OUT_1);	            //Set High
         wait_us(7);					   				//approximately 7us
@@ -226,8 +192,8 @@ static void WriteOneByte(unsigned char Data2Send)
     unsigned char Bit2Send;
 
     MaskByte = 0x01;
-	
-    for (i = 0; i < 8; i++) 
+
+    for (i = 0; i < 8; i++)
     {
         Bit2Send = Data2Send & MaskByte;		//Selects the bit to be sent
         WriteOneBit(Bit2Send);					//Writes the selected bit
@@ -247,7 +213,7 @@ static void WriteOneByte(unsigned char Data2Send)
 static unsigned char ReadOneBit(void)
 {
     static unsigned char InBit;
-	
+
     gpio_direction_output(BQ2202A_GPIO, GPIO_DIR_OUT_1);			//Set GPIO P9.3 as Output
     													            //Set High
     gpio_direction_output(BQ2202A_GPIO, GPIO_DIR_OUT_0);	                //Set Low
@@ -255,7 +221,7 @@ static unsigned char ReadOneBit(void)
     wait_us(15);		   								//Strobe window	~ 12us
     InBit = gpio_get_value(BQ2202A_GPIO);		        //This function takes about 3us
 													//Between the wait_us and GPIO_ReadBit functions
-													//approximately 15us should occur to monitor the 
+													//approximately 15us should occur to monitor the
 													//GPIO line and determine if bit read is one or zero
     wait_us(65);									//End of Bit
     gpio_direction_output(BQ2202A_GPIO, GPIO_DIR_OUT_1);			//Set GPIO P9.3 as Output
@@ -281,9 +247,9 @@ static unsigned char ReadOneByte(void)
     unsigned char MaskByte;
 
     DataByte = 0x00;			 				//Initialize return value
-	
+
     for (i = 0; i < 8; i++)                                      //Select one bit at a time
-    {                  
+    {
         MaskByte = ReadOneBit();				    //Read One Bit
         MaskByte <<= i;							//Determine Bit position within the byte
         DataByte = DataByte | MaskByte;			//Keep adding bits to form the byte
@@ -304,31 +270,17 @@ void ReadBq2202aID(void)
 {
     unsigned char i;
     mutex_lock(&bq2202a_access);
-     
+
     SendReset();
     wait_us(2);
     i=TestPresence();
-    #ifdef DEBUG_BQ2202A
-    //printk("TestPresence=%d\n",i);
-    #endif
-	//printk("TestPresence----1------WriteOneByte\t\n");
-    //wait_us(600);
-	//printk("TestPresence----2------WriteOneByte\t\n");
     WriteOneByte(READ_ID_CMD);                      // read rom commond
     for(i=0;i<8;i++)
     {
-        //ReadIDDataByte[i] = ReadOneByte();      // read rom Partition 64bits = 8Bits
         ReadIDDataByte[7-i] = ReadOneByte();      // read rom Partition 64bits = 8Bits
     }
 
     mutex_unlock(&bq2202a_access);
-    //#ifdef DEBUG_BQ2202A
-	/*
-    for(i=0;i<8;i++)
-    {
-        printk("ReadBq2202aID[%d]=%d\n",i,ReadIDDataByte[i]);
-    }*/
-    //#endif
 	printk("ReadBq2202aID[0]  =%03d,ReadBq2202aID[1]  =%03d,ReadBq2202aID[2]  =%03d,ReadBq2202aID[3]  =%03d,ReadBq2202aID[4]  =%03d,ReadBq2202aID[5]  =%03d,ReadBq2202aID[6]  =%03d,ReadBq2202aID[7]  =%03d\n",ReadIDDataByte[0],ReadIDDataByte[1],ReadIDDataByte[2],ReadIDDataByte[3],ReadIDDataByte[4],ReadIDDataByte[5],ReadIDDataByte[6],ReadIDDataByte[7]);
 }
 /**********************************************************************/
@@ -344,62 +296,27 @@ void CheckBq2202aID(void)
 {
     unsigned char i;
     mutex_lock(&bq2202a_access);
-       
+
     SendReset();
     wait_us(2);
     i=TestPresence();
-#ifdef DEBUG_BQ2202A
-    //printk("TestPresence=%d\n",i);
-#endif
-
     WriteOneByte(SKIP_ROM_CMD);              // skip rom commond
     wait_us(60);
 
-#ifdef READ_PAGE_BQ2202A
     WriteOneByte(READ_PAGE_ID_CMD);     // read eprom Partition for page mode
-#else
-    WriteOneByte(READ_FIELD_ID_CMD);     // read eprom Partition for field mode
-#endif
     wait_us(60);
     WriteOneByte(AddressLow);               // read eprom Partition Starting address low
     wait_us(60);
     WriteOneByte(AddressHigh);               // read eprom Partition Starting address high
 
-#ifdef READ_PAGE_BQ2202A
     for(i=0;i<32;i++)
     {
         CheckIDDataByte[i] = ReadOneByte();   // read eprom Partition page1  256bits = 32Bits
     }
 
     mutex_unlock(&bq2202a_access);
-	/*
-    #ifdef DEBUG_BQ2202A	
-    for(i=0;i<32;i++)
-    {
-        printk("CheckBq2202aID[%d]=%d\n",i,CheckIDDataByte[i]);
-    }
-    #endif
-	*/	
 	printk("CheckBq2202aID[16]=%03d,CheckBq2202aID[17]=%03d,CheckBq2202aID[18]=%03d,CheckBq2202aID[19]=%03d,CheckBq2202aID[20]=%03d,CheckBq2202aID[21]=%03d,CheckBq2202aID[22]=%03d,CheckBq2202aID[23]=%03d\n",CheckIDDataByte[16],CheckIDDataByte[17],CheckIDDataByte[18],CheckIDDataByte[19],CheckIDDataByte[20],CheckIDDataByte[21],CheckIDDataByte[22],CheckIDDataByte[23]);
-	//printk("CheckBq2202aID[24]=%03d,CheckBq2202aID[25]=%03d,CheckBq2202aID[26]=%03d,CheckBq2202aID[27]=%03d,CheckBq2202aID[28]=%03d,CheckBq2202aID[29]=%03d,CheckBq2202aID[30]=%03d,CheckBq2202aID[31]=%03d\n",CheckIDDataByte[24],CheckIDDataByte[25],CheckIDDataByte[26],CheckIDDataByte[27],CheckIDDataByte[28],CheckIDDataByte[29],CheckIDDataByte[30],CheckIDDataByte[31]);
-	//printk("CheckBq2202aID[0] =%03d,CheckBq2202aID[1] =%03d,CheckBq2202aID[2] =%03d,CheckBq2202aID[3] =%03d,CheckBq2202aID[4] =%03d,CheckBq2202aID[5] =%03d,CheckBq2202aID[6] =%03d,CheckBq2202aID[7] =%03d\n",CheckIDDataByte[0],CheckIDDataByte[1],CheckIDDataByte[2],CheckIDDataByte[3],CheckIDDataByte[4],CheckIDDataByte[5],CheckIDDataByte[6],CheckIDDataByte[7]);
-	//printk("CheckBq2202aID[8] =%03d,CheckBq2202aID[9] =%03d,CheckBq2202aID[10]=%03d,CheckBq2202aID[11]=%03d,CheckBq2202aID[12]=%03d,CheckBq2202aID[13]=%03d,CheckBq2202aID[14]=%03d,CheckBq2202aID[15]=%03d\n",CheckIDDataByte[8],CheckIDDataByte[9],CheckIDDataByte[10],CheckIDDataByte[11],CheckIDDataByte[12],CheckIDDataByte[13],CheckIDDataByte[14],CheckIDDataByte[15]);
-	
-	
-#else 
-    for(i=0;i<128;i++)
-    {
-        CheckIDDataByte[i] = ReadOneByte();   // read eprom Partition field  1024bits = 128Bits
-    }
-    mutex_unlock(&bq2202a_access);
 
-    #ifdef DEBUG_BQ2202A
-    for(i=0;i<128;i++)
-    {
-        printk("CheckBq2202aID[%d]=%d\n",i,CheckIDDataByte[i]);
-    }
-    #endif
-#endif
 }
 /**********************************************************************/
 /* 	void CheckIDCompare(void)               							  */
@@ -411,9 +328,9 @@ void CheckBq2202aID(void)
 /*  Returns: 			None       							          */
 /**********************************************************************/
 
-void CheckIDCompare(void) 
+void CheckIDCompare(void)
 {
-    unsigned char i,j;  
+    unsigned char i,j;
     int IDReadSign=1;
 
     if(IDReadSign==1)
@@ -443,11 +360,7 @@ void CheckIDCompare(void)
             {
                 continue;
             }
-        } 
+        }
         IDReadSign=0;
     }
 }
-
-
-
-

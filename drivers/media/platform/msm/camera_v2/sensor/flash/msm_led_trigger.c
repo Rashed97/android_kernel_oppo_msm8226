@@ -14,6 +14,7 @@
 #define pr_fmt(fmt) "%s:%d " fmt, __func__, __LINE__
 
 #include <linux/module.h>
+#include <linux/proc_fs.h>
 #include "msm_led_flash.h"
 
 #define FLASH_NAME "camera-led-flash"
@@ -31,11 +32,9 @@ extern int32_t msm_led_torch_create_classdev(
 
 static enum flash_type flashtype;
 static struct msm_led_flash_ctrl_t fctrl;
-#ifdef VENDOR_EDIT
-//lingjianing add for blink test
 bool blink_state;
 int flash_state;
-#endif
+
 static int32_t msm_led_trigger_get_subdev_id(struct msm_led_flash_ctrl_t *fctrl,
 	void *arg)
 {
@@ -124,8 +123,6 @@ static int32_t msm_led_trigger_config(struct msm_led_flash_ctrl_t *fctrl,
 	return rc;
 }
 
-#ifdef VENDOR_EDIT
-//lingjianing add for blink test
 static void msm_led_trigger_test_blink_work(struct work_struct *work)
 {
         struct delayed_work *dwork = to_delayed_work(work);
@@ -137,9 +134,7 @@ static void msm_led_trigger_test_blink_work(struct work_struct *work)
         schedule_delayed_work(dwork, msecs_to_jiffies(1100));
         return;
 }
-#endif
-#ifdef VENDOR_EDIT
-//zhangzr add for flashlight test
+
 static ssize_t msm_led_trigger_test_store(struct device *dev, struct device_attribute *attr,
 			 const char *buf, size_t count)
 {
@@ -150,12 +145,9 @@ static ssize_t msm_led_trigger_test_store(struct device *dev, struct device_attr
     if(new_mode == 0)
     {
             printk("close flash called\n");
-	     #ifdef VENDOR_EDIT
-           //lingjianing add for blink test
-	     if (flash_state == 2) 
+	     if (flash_state == 2)
             cancel_delayed_work_sync(&fctrl.dwork);
 	     flash_state = 0;
-	     #endif
             for (i = 0; i < fctrl.num_sources; i++)
                 if (fctrl.flash_trigger[i])
                     led_trigger_event(fctrl.flash_trigger[i], 0);
@@ -165,12 +157,9 @@ static ssize_t msm_led_trigger_test_store(struct device *dev, struct device_attr
     else if(new_mode == 1)
     {
             printk("open flash called\n");
-	    #ifdef VENDOR_EDIT
-           //lingjianing add for blink test	
-	    if (flash_state == 2) 
+	    if (flash_state == 2)
            cancel_delayed_work_sync(&fctrl.dwork);
 	    flash_state = 1;
-	    #endif
             if (fctrl.torch_trigger) {
                 curr_l = fctrl.torch_op_current;
                 pr_err("LED current clamped to %d\n",
@@ -179,8 +168,6 @@ static ssize_t msm_led_trigger_test_store(struct device *dev, struct device_attr
                 curr_l);
             }
     } 
-     #ifdef VENDOR_EDIT
-       //lingjianing add for blink test
     else if(new_mode == 2)
     {   
          printk("blink called\n");
@@ -191,8 +178,7 @@ static ssize_t msm_led_trigger_test_store(struct device *dev, struct device_attr
 	  INIT_DELAYED_WORK(&fctrl.dwork, msm_led_trigger_test_blink_work);
     	  schedule_delayed_work(&fctrl.dwork, msecs_to_jiffies(50));
      }
-    #endif
-    return count; 
+    return count;
 }
 
 static DEVICE_ATTR(test, 0660,
@@ -206,12 +192,7 @@ static struct attribute *msm_led_trigger_attributes[] = {
 static const struct attribute_group msm_led_trigger_attr_group = {
 	.attrs = msm_led_trigger_attributes,
 };
-//zhangzr add end
-#endif
 
-#ifdef VENDOR_EDIT
-//LiuBin@Camera, 2014/04/14, Add proc for flash test
-#include <linux/proc_fs.h>
 static int flash_proc_read(char *page, char **start, off_t off, int count,
    int *eof, void *data)
 {
@@ -314,8 +295,6 @@ static int flash_proc_init(struct msm_led_flash_ctrl_t *flash_ctl)
 	
 	return ret;
 }
-
-#endif /* VENDOR_EDIT */
 
 
 static const struct of_device_id msm_led_trigger_dt_match[] = {
@@ -476,18 +455,11 @@ torch_failed:
 	if (!rc)
 		msm_led_torch_create_classdev(pdev, &fctrl);
 
-#ifdef VENDOR_EDIT
-//zhangzr add for flashlight test
       if (rc >= 0)
         rc = sysfs_create_group(&pdev->dev.kobj, &msm_led_trigger_attr_group);
-//zhangzr add end
-#endif
 
-#ifdef VENDOR_EDIT
-//LiuBin@MtkCamera, 2014/04/14, Add for flash proc
 	if (rc >= 0)
     	flash_proc_init(&fctrl);
-#endif /* VENDOR_EDIT */
 
 	return rc;
 }

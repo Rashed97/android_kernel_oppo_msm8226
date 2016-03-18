@@ -3422,22 +3422,12 @@ static struct clk_lookup msm_clocks_8226[] = {
 	CLK_LOOKUP("cam_src_clk", mclk0_clk_src.c, "6a.qcom,camera"),
 	CLK_LOOKUP("cam_src_clk", mclk0_clk_src.c, "6c.qcom,camera"),
 	CLK_LOOKUP("cam_src_clk", mclk0_clk_src.c, "20.qcom,camera"),
-/*zhaozhengtao add for imx179 begin 2014-02-14*/	
-	CLK_LOOKUP("cam_src_clk", mclk0_clk_src.c, "21.qcom,camera"),
-/*zhaozhengtao add for imx179 end*/	
-	CLK_LOOKUP("cam_src_clk", mclk0_clk_src.c, "40.qcom,camera"),	//lxl add 
-	
 	CLK_LOOKUP("cam_clk", camss_mclk0_clk.c, "6f.qcom,camera"),
 	CLK_LOOKUP("cam_clk", camss_mclk0_clk.c, "90.qcom,camera"),
 	CLK_LOOKUP("cam_clk", camss_mclk0_clk.c, "6d.qcom,camera"),
 	CLK_LOOKUP("cam_clk", camss_mclk0_clk.c, "6a.qcom,camera"),
 	CLK_LOOKUP("cam_clk", camss_mclk0_clk.c, "6c.qcom,camera"),
 	CLK_LOOKUP("cam_clk", camss_mclk0_clk.c, "20.qcom,camera"),
-/*zhaozhengtao add for imx179 begin 2014-02-14*/	
-	CLK_LOOKUP("cam_clk", camss_mclk0_clk.c, "21.qcom,camera"),
-/*zhaozhengtao add for imx179 end*/	
-	CLK_LOOKUP("cam_clk", camss_mclk0_clk.c, "40.qcom,camera"), //lxl add 
-	
 
 	/* eeprom clocks */
 	CLK_LOOKUP("cam_src_clk", mclk0_clk_src.c, "6c.qcom,eeprom"),

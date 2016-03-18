@@ -936,7 +936,6 @@ static int get_rbatt(struct qpnp_bms_chip *chip,
 		pr_debug("RBATT = %d\n", rbatt_mohm);
 		return rbatt_mohm;
 	}
-	
 	/* Convert the batt_temp to DegC from deciDegC */
 	batt_temp = batt_temp / 10;
 	scalefactor = interpolate_scalingfactor(chip->rbatt_sf_lut,
@@ -1067,7 +1066,7 @@ static int read_soc_params_raw(struct qpnp_bms_chip *chip,
 {
 	int warm_reset, rc;
 	int last_ocv_uv_estimate = 0;
-	
+
 	mutex_lock(&chip->bms_output_lock);
 
 	lock_output_data(chip);
@@ -3710,25 +3709,8 @@ static int set_battery_data(struct qpnp_bms_chip *chip)
 		batt_data = &QRD_4v35_2000mAh_data;
 	} else if (chip->batt_type == BATT_QRD_4V2_1300MAH) {
 		batt_data = &qrd_4v2_1300mah_data;
-	#ifdef VENDOR_EDIT
-	} else if (chip->batt_type == BATT_OPPO_13095_1394183_2500mAh) {
-		batt_data = &OPPO_13095_1394183_2500mAh_data;
 	} else if (chip->batt_type == BATT_OPPO_14033_14013_1394183_1900mAh) {
-		if(oppo_high_battery_status == 1)
-		{
-			batt_data = &OPPO_14033_14013_1394183_1900mAh_data;
-			pr_err("kongfanhong OPPO_14033_14013_1394183_1900mAh_data\n");
-		}
-		else
-		{
-			batt_data = &OPPO_14033_14013_nonstand_1700mAh_data;
-			pr_err("kongfanhong OPPO_14033_14013_nonstand_1700mAh_data\n");
-		}
-	} else if (chip->batt_type == BATT_OPPO_14027_14029_9560607_2140mAh) {
-	batt_data = &OPPO_14027_9560607_2140mAh_data;
-	} else if (chip->batt_type == BATT_OPPO_14017_1394183_2420mAh) {
-	batt_data = &OPPO_14017_1394183_2420mAh_data;
-	#endif
+	batt_data = &OPPO_14033_14013_1394183_1900mAh_data;
 	} else {
 		battery_id = read_battery_id(chip);
 		if (battery_id < 0) {
@@ -4411,7 +4393,7 @@ static int __devinit qpnp_bms_probe(struct spmi_device *spmi)
 			goto error_read;
 		}
 	}
-	
+
 	#if 0
 	while(!chip_smb358)
 	{
@@ -4496,7 +4478,7 @@ static int __devinit qpnp_bms_probe(struct spmi_device *spmi)
 		pr_err("power_supply_register bms failed rc = %d\n", rc);
 		goto unregister_dc;
 	}
-	
+
 	chip->bms_psy_registered = true;
 	chip_bms = chip;
 	
@@ -4507,7 +4489,7 @@ static int __devinit qpnp_bms_probe(struct spmi_device *spmi)
 						VBAT_SNS, rc);
 		goto unregister_dc;
 	}
-	
+
 	batt_temp = qpnp_bms_get_batt_therm(chip);
 	gFG_15_vlot = find_ocv_for_pc(chip,batt_temp,15)/1000;
 	

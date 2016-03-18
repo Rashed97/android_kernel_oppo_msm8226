@@ -196,26 +196,25 @@ static ProjectInfoCDTType *format = NULL;
 
 
 unsigned int init_project_version(void)
-{	
+{
 	unsigned int len = (sizeof(ProjectInfoCDTType) + 3)&(~0x3);
 
-	format = (ProjectInfoCDTType *)smem_alloc2(SMEM_PROJECT,len);
+	format = (ProjectInfoCDTType *)smem_alloc2(SMEM_PROJECT, len);
 
-	if(format)
+	if (format)
 		return format->nProject;
-	
 	return 0;
 }
-
 
 unsigned int get_project(void)
 {
-	if(format)
+	if (format)
 		return format->nProject;
+
 	return 0;
 }
 
-unsigned int is_project(OPPO_PROJECT project )
+unsigned int is_project(OPPO_PROJECT project)
 {
 	return (get_project() == project?1:0);
 }
@@ -249,18 +248,12 @@ static int prjVersion_read_proc(char *page, char **start, off_t off,
     unsigned char operator_version;
 	int len;
 	operator_version = get_Operator_Version();
-	
-    if(is_project(OPPO_14033)){
-	    if(operator_version == 3)
-		   len = sprintf(page,"%d",14035);
-		else 
-		   len = sprintf(page,"%d",14033);
-    }
-	else if(is_project(OPPO_14013)){
+
+    if(is_project(OPPO_14013)){
 	    if(operator_version == 3)
 		   len = sprintf(page,"%d",14016);
-		else 
-		   len = sprintf(page,"%d",14013);
+		else
+	len = sprintf(page,"%d",14013);
     }
 	else if(is_project(OPPO_14017)){
 	    if(operator_version == 3)
@@ -268,21 +261,15 @@ static int prjVersion_read_proc(char *page, char **start, off_t off,
 		else 
 		   len = sprintf(page,"%d",14017);
     }
-	else if(is_project(OPPO_14029)){
-	    if(operator_version == 3)
-		   len = sprintf(page,"%d",14031);
-		else 
-		   len = sprintf(page,"%d",14029);
-    }		
 	else if(is_project(OPPO_13095)){
 	    if(operator_version == 3)
 		   len = sprintf(page,"%d",13084);
 		else 
 		   len = sprintf(page,"%d",13095);
-    }		
+    }
 	else
 	   len = sprintf(page,"%d",get_project());
-	
+
 	if (len <= off+count)
 		*eof = 1;
 	*start = page + off;
@@ -326,12 +313,11 @@ static int operatorName_read_proc(char *page, char **start, off_t off,
 	return len;
 }
 
-
 static int modemType_read_proc(char *page, char **start, off_t off,
 			   int count, int *eof, void *data)
 {
 	int len = sprintf(page,"%d",get_Modem_Version());
-	
+
 	if (len <= off+count)
 		*eof = 1;
 	*start = page + off;
@@ -347,7 +333,7 @@ static int __init oppo_project_init(void)
 {
 	int ret = 0;
 	struct proc_dir_entry *pentry;
-	
+
 	oppoVersion =  proc_mkdir ("oppoVersion", NULL);
 	if(!oppoVersion) {
 		pr_err("can't create oppoVersion proc\n");
@@ -374,20 +360,17 @@ static int __init oppo_project_init(void)
 		pr_err("create modemType proc failed.\n");
 		return -ENOENT;
 	}
-	
+
 	return ret;
 }
 
 static void __exit oppo_project_init_exit(void)
 {
-
 	remove_proc_entry("oppoVersion", NULL);
-
 }
 
 module_init(oppo_project_init);
 module_exit(oppo_project_init_exit);
-
 
 MODULE_DESCRIPTION("OPPO project version");
 MODULE_LICENSE("GPL v2");

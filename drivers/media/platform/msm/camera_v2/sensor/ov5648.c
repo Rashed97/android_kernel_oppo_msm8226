@@ -12,29 +12,23 @@
  */
 #include "msm_sensor.h"
 #define OV5648_SENSOR_NAME "ov5648"
-
-#include <mach/device_info.h>
-#define DEVICE_VERSION	"ov5648"
-#define DEVICE_MANUFACUTRE	"OmniVision"
-
- 
 DEFINE_MSM_MUTEX(ov5648_mut);
 
 static struct msm_sensor_ctrl_t ov5648_s_ctrl;
 
-static struct msm_sensor_power_setting ov5648_power_setting[] = {	
+static struct msm_sensor_power_setting ov5648_power_setting[] = {
 	{
 		.seq_type = SENSOR_GPIO,
 		.seq_val = SENSOR_GPIO_RESET,
 		.config_val = GPIO_OUT_LOW,
 		.delay = 0,
 	},
-	{ 
+	{
 		.seq_type = SENSOR_GPIO,
 		.seq_val = SENSOR_GPIO_RESET,
 		.config_val = GPIO_OUT_HIGH,
 		.delay = 5,
-	},	
+	},
 	{
 		.seq_type = SENSOR_VREG,
 		.seq_val = CAM_VIO,
@@ -47,7 +41,7 @@ static struct msm_sensor_power_setting ov5648_power_setting[] = {
 		.config_val = 0,
 		.delay = 0,
 	},
-    {
+	{
 		.seq_type = SENSOR_GPIO,
 		.seq_val = SENSOR_GPIO_STANDBY,
 		.config_val = GPIO_OUT_LOW,
@@ -121,14 +115,9 @@ static int32_t ov5648_platform_probe(struct platform_device *pdev)
 	const struct of_device_id *match;
 	match = of_match_device(ov5648_dt_match, &pdev->dev);
 	rc = msm_sensor_platform_probe(pdev, match->data);
-      if(!rc)
-      {
-          register_device_proc("f_camera", DEVICE_VERSION, DEVICE_MANUFACUTRE);
-      }
-
 	return rc;
 }
- 
+
 static int __init ov5648_init_module(void)
 {
 	int32_t rc = 0;
@@ -146,7 +135,6 @@ static void __exit ov5648_exit_module(void)
 		msm_sensor_free_sensor_data(&ov5648_s_ctrl);
 		platform_driver_unregister(&ov5648_platform_driver);
 	}
-    
 	return;
 }
 

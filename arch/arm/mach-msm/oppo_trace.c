@@ -46,15 +46,14 @@
 
 #include "oppo_trace.h"
 
-
 #define IOCTL_OTRACER_TEST     		(1<<0)
 #define IOCTL_OTRACER_STACK     	(1<<1)
 #define IOCTL_OTRACER_MEMINFO   	(1<<2)
 #define IOCTL_OTRACER_TASKINFO	 	(1<<3)
 #define IOCTL_OTRACER_ALLINFO       (1<<4)
 #define IOCTL_OTRACER_TOLCD       	(1<<5)
-
 #define IOCTL_OTRACER_PANIC		(1<<12)
+#define LBUFSIZE 1200UL
 
 struct vmalloc_info {
 	unsigned long	used;
@@ -65,14 +64,6 @@ struct vmalloc_info {
 #define VMALLOC_TOTAL (VMALLOC_END - VMALLOC_START)
 extern void get_vmalloc_info(struct vmalloc_info *vmi);
 #endif
-
-
-/* OPPO 2012-10-11 chendx Delete begin for debugtools Todo */
-#if 0
-extern unsigned reboot_reason;
-extern void *restart_reason;
-#endif
-/* OPPO 2012-10-11 chendx Delete end */
  
 void backtrace_test_saved(void)
 {
@@ -88,8 +79,6 @@ void backtrace_test_saved(void)
 
 	printk("Testing a dump_stack.\n");
 	dump_stack();
-	//printk("Testing a save_stack_trace.\n");
-	//save_stack_trace(&trace);
 	printk("Testing a print_stack_trace.\n");
 	print_stack_trace(&trace, 0);
 }
@@ -181,12 +170,7 @@ void meminfo_test_saved(void)
 #define K(x) ((x) << (PAGE_SHIFT - 10))
 	si_meminfo(&i);
 	si_swapinfo(&i);
-/* OPPO 2010-11-18 Laijl Modify begin for msm platform */
-#if 0
-	committed = atomic_long_read(&vm_committed_space);
-#else
 	committed = percpu_counter_read_positive(&vm_committed_as);
-#endif
 /* OPPO 2010-11-18 Laijl Modify end */
 	allowed = ((totalram_pages - hugetlb_total_pages())
 		* sysctl_overcommit_ratio / 100) + total_swap_pages;
@@ -308,10 +292,6 @@ void meminfo_test_saved(void)
 #undef K
 }
 
-#if 0
-extern int oppo_con_write(const unsigned char *buf, int count);
-extern void console_activate(void);
-#else
 int oppo_con_write(const unsigned char *buf, int count)
 {
 	return 0;
@@ -321,8 +301,6 @@ void console_activate(void)
 {
 	return;
 }
-#endif
-
 
 static ssize_t otracer_read(struct file *filp, char __user *buf,
 			    size_t size, loff_t *offp)
@@ -331,21 +309,6 @@ static ssize_t otracer_read(struct file *filp, char __user *buf,
 	return 0;
 }
 
-/* OPPO 2010-11-25 Laijl Modify begin for reason buf overflaot*/
-#if 0
-static ssize_t otracer_write(struct file *filp, const char __user *buf,
-						size_t count, loff_t *offp)
-{
-	printk(KERN_INFO "otracer_write: initialized\n");
-	if (!count)
-		return -EIO;
-	console_activate();
-	printk( "otracer_write console_activate pass\n");
-	oppo_con_write(buf, count);
-	printk( "otracer_write oppo_con_write pass\n");
-	return count;
-}
-#else
 /* OPPO 2011-03-02 huanggd Add begin for oppo logo display */
 extern int fbcon_takeover_global(int show_logo) ;
 /* OPPO 2011-03-02 huanggd Add end */
@@ -353,9 +316,9 @@ extern int fbcon_takeover_global(int show_logo) ;
 #ifdef CONFIG_MODEM_ERR_ENTER_RAMDUMP
  bool otrace_on = false;
 #else
- static bool otrace_on = false;	  
+static bool otrace_on = false;
 #endif
-/* OPPO 2013-01-30 zhenwx Modify end */	
+/* OPPO 2013-01-30 zhenwx Modify end */
 bool is_otrace_on(void)
 {
 	return otrace_on;
@@ -391,9 +354,7 @@ end:
     printk( KERN_ERR "otracer_write fail! \n");
     return ( -EFAULT);
 }
-	
-#endif
-/* OPPO 2010-11-25 Laijl Modify end */
+
 static long otracer_ioctl(struct file * filp, 
 		   unsigned int cmd, unsigned long arg)
 {
@@ -407,13 +368,6 @@ static long otracer_ioctl(struct file * filp,
     /* mwalker give a chance to change reboot result to android for android framework. */
     if (cmd == IOCTL_TRACE_UPDATE_REBOOTFLAG) {
         printk (KERN_INFO "android update reboot flag\n");
-       
-/* OPPO 2012-10-11 chendx Delete begin for debug tools Todo */
-#if 0
-        reboot_reason = 0x7766550c;
-        writel(0x7766550c, restart_reason);
-#endif
-/* OPPO 2012-10-11 chendx Delete end */
 
         goto end;
     }
@@ -424,7 +378,6 @@ static long otracer_ioctl(struct file * filp,
 			break;
 		if(cmdv & IOCTL_OTRACER_TOLCD)
 		{
-			//console_activate();
 			cmdv &= (~IOCTL_OTRACER_TOLCD);
 		}
 		if(cmdv & IOCTL_OTRACER_STACK)
@@ -451,8 +404,6 @@ static long otracer_ioctl(struct file * filp,
 		}
 		if(cmdv & IOCTL_OTRACER_PANIC) 
 		{
-		  //	pr_info("ioctl panic reboot\n");
-          //  panic("android");
             cmdv &= (~IOCTL_OTRACER_PANIC);
         }
        
@@ -460,11 +411,13 @@ static long otracer_ioctl(struct file * filp,
 end:
 	return 0;
 }
+
 static int otracer_open(struct inode *inode, struct file *file)
 {
 	pr_info("%s\n", __func__);
 	return nonseekable_open(inode, file);
 }
+
 static int otracer_close(struct inode *inode, struct file *file)
 {
 	pr_info("%s\n", __func__);
@@ -493,6 +446,7 @@ static int otrace_proc_open(struct inode *inode, struct file *file)
 {
 	return single_open(file, otrace_proc_show, NULL);
 }
+
 static ssize_t otrace_proc_write(struct file *file, const char __user *buffer,
 				 size_t count, loff_t *pos)
 {
@@ -503,7 +457,6 @@ static ssize_t otrace_proc_write(struct file *file, const char __user *buffer,
 	if (count <= 0)
 		return 0;
 	
-#define LBUFSIZE 1200UL
 	lbuf = kmalloc(LBUFSIZE, GFP_KERNEL);
 	if (!lbuf)
 		return 0;
@@ -527,8 +480,6 @@ static ssize_t otrace_proc_write(struct file *file, const char __user *buffer,
 	kfree(lbuf);
 	return count;
 }
-
-
 
 static const struct file_operations otrace_proc_fops = {
 	.owner		= THIS_MODULE,
@@ -584,5 +535,3 @@ module_exit(otracer_exit);
 MODULE_LICENSE("GPL");
 MODULE_DESCRIPTION("oppo tracer");
 MODULE_AUTHOR("Andy <gmy@oppo.com>");
-
-

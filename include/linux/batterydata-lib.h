@@ -141,11 +141,7 @@ extern struct bms_battery_data  oem_batt_data;
 extern struct bms_battery_data QRD_4v35_2000mAh_data;
 extern struct bms_battery_data  qrd_4v2_1300mah_data;
 #ifdef VENDOR_EDIT
-extern struct bms_battery_data OPPO_13095_1394183_2500mAh_data;
 extern struct bms_battery_data OPPO_14033_14013_1394183_1900mAh_data;
-extern struct bms_battery_data OPPO_14027_9560607_2140mAh_data;
-extern struct bms_battery_data OPPO_14017_1394183_2420mAh_data;
-extern struct bms_battery_data OPPO_14033_14013_nonstand_1700mAh_data;
 #endif
 
 int interpolate_fcc(struct single_row_lut *fcc_temp_lut, int batt_temp);
