@@ -1,0 +1,36 @@
+# this file for OPPO input devices
+
+config INPUT_OPPO
+	bool "Oppo input extensions"
+	---help---
+	Say Y to build extensions.
+
+config SYNAPTIC_OPPO13095
+	bool "TP S3203"
+	select INPUT_OPPO
+	---help---
+	Say Y to enable Synaptics Clearpad 3203 driver for Touchpanel.
+
+config HALL
+	bool "HALL sensor for OPPO 13095"
+	select INPUT_OPPO
+	---help---
+	Say Y to add HALL driver.
+
+config PSWITCH
+	bool "pswitch"
+	select INPUT_OPPO
+	---help---
+	Say Y to add PSWITCH driver.
+
+config UEI
+	bool "UEI driver"
+	select INPUT_OPPO
+	---help---
+	Say Y to add UEI driver.
+
+config DHALL_M1120
+	bool "M1120 DHALL sensor"
+	select INPUT_OPPO
+	---help---
+	Say Y to add M1120 DHALL driver.

@@ -22,11 +22,153 @@
 #include <linux/pwm.h>
 #include <linux/err.h>
 
+//Caven.han Added for ESD_CHECK
+#include <linux/switch.h>
+#include <linux/proc_fs.h>
+//Added for device list
+#include <mach/device_info.h>
+#include <mach/oppo_boot_mode.h>
 #include "mdss_dsi.h"
+#include <mach/oppo_project.h>
 
 #define DT_CMD_HDR 6
 
 DEFINE_LED_TRIGGER(bl_led_trigger);
+#ifdef VENDOR_EDIT
+extern void lm3630_control(int lcd_bl_level);
+#define LCD_JDI 0
+#define LCD_TRULY 1
+#define LCD_SHARP 2
+#define LCD_UNKNOW 3
+int lcd_dev=0;
+//zhli
+char lcd_flag_id = 0;
+enum {
+GAMMA_BALANCE=0,
+GAMMA_NORMAL,
+GAMMA_YELLOW,
+};
+//caven.han@basic.drv Added for ESD_CHECK
+ bool  lcd_is_suspended =false;
+//CABC function://caven.han apply
+struct dsi_panel_cmds cabc_off_sequence;
+struct dsi_panel_cmds cabc_user_interface_image_sequence;
+struct dsi_panel_cmds cabc_still_image_sequence;
+struct dsi_panel_cmds cabc_video_image_sequence;
+//Added for camera control cabc by caven.han
+
+/* OPPO 2014-04-25 gousj Add begin for 14017 mipi read */
+static struct dsi_buf dsi_panel_tx_buf;
+static struct dsi_buf dsi_panel_rx_buf;
+#define DSI_BUF_SIZE	1024
+/* OPPO 2014-04-25 gousj Add end */
+
+static struct mdss_dsi_ctrl_pdata *panel_data;
+static void mdss_dsi_panel_cmds_send(struct mdss_dsi_ctrl_pdata *ctrl,
+			struct dsi_panel_cmds *pcmds);
+
+extern int set_backlight_pwm(int state);
+
+enum
+{
+    CABC_CLOSE = 0,
+    CABC_LOW_MODE,
+    CABC_MIDDLE_MODE,
+    CABC_HIGH_MODE,
+
+};
+
+int cabc_mode = CABC_HIGH_MODE; //defaoult mode level 3 in dtsi file
+
+static DEFINE_MUTEX(cabc_mutex);
+
+int set_cabc(int level)
+{
+    int ret = 0;
+	if(is_project(OPPO_13095)){
+		if(get_PCB_Version() < HW_VERSION__12){
+			cabc_mode=CABC_CLOSE;
+			return 0;
+		}
+	}else if(!is_project(OPPO_14029)){
+		return 0;
+	}
+
+    mutex_lock(&cabc_mutex);
+
+	if(lcd_is_suspended == true)
+    {
+        printk(KERN_INFO "lcd is off,don't allow to set cabc\n");
+        cabc_mode = level;
+        mutex_unlock(&cabc_mutex);
+        return 0;
+    }
+
+    mdss_dsi_clk_ctrl(panel_data, 1);
+
+    switch(level)
+    {
+        case 0:
+            set_backlight_pwm(0);
+			 mdss_dsi_panel_cmds_send(panel_data, &cabc_off_sequence);
+            cabc_mode = CABC_CLOSE;
+            break;
+        case 1:
+            mdss_dsi_panel_cmds_send(panel_data, &cabc_user_interface_image_sequence);
+            cabc_mode = CABC_LOW_MODE;
+			set_backlight_pwm(1);
+            break;
+        case 2:
+            mdss_dsi_panel_cmds_send(panel_data, &cabc_still_image_sequence);
+            cabc_mode = CABC_MIDDLE_MODE;
+			set_backlight_pwm(1);
+            break;
+        case 3:
+            mdss_dsi_panel_cmds_send(panel_data, &cabc_video_image_sequence);
+            cabc_mode = CABC_HIGH_MODE;
+			set_backlight_pwm(1);
+            break;
+        default:
+            pr_err("%s Leavel %d is not supported!\n",__func__,level);
+            ret = -1;
+            break;
+    }
+    mdss_dsi_clk_ctrl(panel_data, 0);
+    mutex_unlock(&cabc_mutex);
+    return ret;
+
+}
+
+static int set_cabc_resume_mode(int mode)
+{
+    int ret;
+	printk("%s : %d yxr \n",__func__,mode);
+    switch(mode)
+    {
+        case 0:
+            set_backlight_pwm(0);
+			mdss_dsi_panel_cmds_send(panel_data, &cabc_off_sequence);
+            break;
+        case 1:
+            mdss_dsi_panel_cmds_send(panel_data, &cabc_user_interface_image_sequence);
+			set_backlight_pwm(1);
+            break;
+        case 2:
+            mdss_dsi_panel_cmds_send(panel_data, &cabc_still_image_sequence);
+			set_backlight_pwm(1);
+            break;
+        case 3:
+           mdss_dsi_panel_cmds_send(panel_data, &cabc_video_image_sequence);
+		   set_backlight_pwm(1);
+            break;
+        default:
+            pr_err("%s  %d is not supported!\n",__func__,mode);
+            ret = -1;
+            break;
+    }
+    return ret;
+}
+#endif
 
 void mdss_dsi_panel_pwm_cfg(struct mdss_dsi_ctrl_pdata *ctrl)
 {
@@ -211,6 +353,11 @@ void mdss_dsi_panel_reset(struct mdss_panel_data *pdata, int enable)
 	}
 }
 
+void mdss_dsi_panel_reset(struct mdss_panel_data *pdata, int enable)
+{
+	  mdss_dsi_panel_reset(pdata, enable);
+}
+
 static char caset[] = {0x2a, 0x00, 0x00, 0x03, 0x00};	/* DTYPE_DCS_LWRITE */
 static char paset[] = {0x2b, 0x00, 0x00, 0x05, 0x00};	/* DTYPE_DCS_LWRITE */
 
@@ -303,7 +450,33 @@ static void mdss_dsi_panel_bl_ctrl(struct mdss_panel_data *pdata,
 			__func__);
 		break;
 	}
+	if((is_project(OPPO_13095))||(is_project(OPPO_14017))||(is_project(OPPO_14029)))
+		lm3630_control(bl_level);
 }
+
+/* OPPO 2014-04-25 gousj Add begin for 14017 esd test */
+#ifdef VENDOR_EDIT
+u32 mipi_d2l_read_reg(struct mdss_dsi_ctrl_pdata *ctrl, u16 reg)
+{
+
+	u32 data;
+	struct dcs_cmd_req cmdreq;
+	struct dsi_cmd_desc cmd_read_reg = {
+	{DTYPE_GEN_READ2, 1, 0, 1, 0, sizeof(reg)}, (char *) &reg};
+	mdss_dsi_buf_init(&dsi_panel_rx_buf);
+	memset(&cmdreq, 0, sizeof(cmdreq));
+	cmdreq.cmds = &cmd_read_reg;
+	cmdreq.cmds_cnt = 1;
+	cmdreq.flags = CMD_REQ_RX | CMD_REQ_COMMIT | CMD_REQ_NO_MAX_PKT_SIZE;
+	cmdreq.rbuf = dsi_panel_rx_buf.data;
+	cmdreq.rlen = 4;
+	cmdreq.cb = NULL;
+	mdss_dsi_cmdlist_put(ctrl, &cmdreq);
+	data = *(u32 *)dsi_panel_rx_buf.data;
+	return data;
+}
+#endif
+/* OPPO 2014-04-25 gousj Add end */
 
 static int mdss_dsi_panel_on(struct mdss_panel_data *pdata)
 {
@@ -321,9 +494,24 @@ static int mdss_dsi_panel_on(struct mdss_panel_data *pdata)
 
 	pr_debug("%s: ctrl=%p ndx=%d\n", __func__, ctrl, ctrl->ndx);
 
-	if (ctrl->on_cmds.cmd_cnt)
+	if (ctrl->on_cmds.cmd_cnt){
 		mdss_dsi_panel_cmds_send(ctrl, &ctrl->on_cmds);
+	}
 
+#ifdef VENDOR_EDIT
+	if((cabc_mode != CABC_HIGH_MODE)){
+		if(is_project(OPPO_13095)){
+			if((get_PCB_Version() >= HW_VERSION__12))
+				set_cabc_resume_mode(cabc_mode);
+		}else if(is_project(OPPO_14029)){
+				set_cabc_resume_mode(cabc_mode);
+		}
+	}
+#endif /*VENDOR_EDIT*/
+//Added by hantong to declear lcd suspended
+#ifdef VENDOR_EDIT
+lcd_is_suspended = false;
+#endif
 	pr_debug("%s:-\n", __func__);
 	return 0;
 }
@@ -338,15 +526,20 @@ static int mdss_dsi_panel_off(struct mdss_panel_data *pdata)
 		return -EINVAL;
 	}
 
+lcd_is_suspended = true;
 	ctrl = container_of(pdata, struct mdss_dsi_ctrl_pdata,
 				panel_data);
 
 	pr_debug("%s: ctrl=%p ndx=%d\n", __func__, ctrl, ctrl->ndx);
 
 	mipi  = &pdata->panel_info.mipi;
+//add for factory mode
+    if(is_project(OPPO_14013) && (MSM_BOOT_MODE__FACTORY == get_boot_mode())){
 
+    }else{
 	if (ctrl->off_cmds.cmd_cnt)
 		mdss_dsi_panel_cmds_send(ctrl, &ctrl->off_cmds);
+	}
 
 	pr_debug("%s:-\n", __func__);
 	return 0;
@@ -902,7 +1095,13 @@ static int mdss_panel_parse_dt(struct device_node *np,
 		pinfo->mode_gpio_state = MODE_GPIO_NOT_VALID;
 	}
 
+//modified by hantong to parase DTS frame-rate
+#ifndef VENDOR_EDIT
+	rc = of_property_read_u32(np, "qcom,mdss-dsi-panel-frame-rate", &tmp);
+#else
 	rc = of_property_read_u32(np, "qcom,mdss-dsi-panel-framerate", &tmp);
+#endif
+
 	pinfo->mipi.frame_rate = (!rc ? tmp : 60);
 	rc = of_property_read_u32(np, "qcom,mdss-dsi-panel-clockrate", &tmp);
 	pinfo->clk_rate = (!rc ? tmp : 0);
@@ -938,6 +1137,11 @@ static int mdss_panel_parse_dt(struct device_node *np,
 	mdss_dsi_parse_dcs_cmds(np, &ctrl_pdata->on_cmds,
 		"qcom,mdss-dsi-on-command", "qcom,mdss-dsi-on-command-state");
 
+	if(lcd_flag_id == 1 ){
+        mdss_dsi_parse_dcs_cmds(np, &ctrl_pdata->begin_on_cmds,
+			"qcom,mdss-dsi-on-command-first", "qcom,mdss-dsi-on-command-state");
+	}
+
 	mdss_dsi_parse_dcs_cmds(np, &ctrl_pdata->off_cmds,
 		"qcom,mdss-dsi-off-command", "qcom,mdss-dsi-off-command-state");
 
@@ -946,6 +1150,31 @@ static int mdss_panel_parse_dt(struct device_node *np,
 error:
 	return -EINVAL;
 }
+
+/* OPPO 2014-04-25 gousj Add begin for 14017 mipi read */
+#ifdef VENDOR_EDIT
+int dsi_buf_alloc_gzm(struct dsi_buf *dp, int size)
+{
+	dp->start = kmalloc(size, GFP_KERNEL);
+	if (dp->start == NULL) {
+		pr_err("%s:%u\n", __func__, __LINE__);
+		return -ENOMEM;
+	}
+
+	dp->end = dp->start + size;
+	dp->size = size;
+
+	if ((int)dp->start & 0x07) {
+		pr_err("%s: buf NOT 8 bytes aligned\n", __func__);
+		return -EINVAL;
+	}
+
+	dp->data = dp->start;
+	dp->len = 0;
+	return 0;
+}
+#endif
+/* OPPO 2014-04-25 gousj Add end */
 
 int mdss_dsi_panel_init(struct device_node *node,
 	struct mdss_dsi_ctrl_pdata *ctrl_pdata,
@@ -960,6 +1189,17 @@ int mdss_dsi_panel_init(struct device_node *node,
 		pr_err("%s: no panel node\n", __func__);
 		return -ENODEV;
 	}
+/* OPPO 2014-04-25 gousj Add begin for 14017 mipi read */
+#ifdef VENDOR_EDIT
+	rc = dsi_buf_alloc_gzm(&dsi_panel_tx_buf,ALIGN(DSI_BUF_SIZE,SZ_4K));
+	rc = dsi_buf_alloc_gzm(&dsi_panel_rx_buf,ALIGN(DSI_BUF_SIZE,SZ_4K));
+#endif
+/* OPPO 2014-04-25 gousj Add end */
+
+	//caven.han added for cabc
+#ifdef VENDOR_EDIT
+	panel_data = ctrl_pdata;
+#endif /*VENDOR_EDIT*/
 
 	pr_debug("%s:%d\n", __func__, __LINE__);
 	panel_name = of_get_property(node, "qcom,mdss-dsi-panel-name", NULL);
@@ -969,6 +1209,17 @@ int mdss_dsi_panel_init(struct device_node *node,
 	else
 		pr_info("%s: Panel Name = %s\n", __func__, panel_name);
 
+#ifdef VENDOR_EDIT
+	if(!strcmp(panel_name,"oppo13095jdi 720p video mode dsi panel")){
+		lcd_dev = LCD_JDI;
+		register_device_proc("lcd", "NT35592", "JDI");
+	}else if(!strcmp(panel_name,"oppo14013tm fwvga video mode dsi panel"))
+		register_device_proc("lcd", "HX8389", "Tianma");
+	else if(!strcmp(panel_name,"oppo14013truly fwvga video mode dsi panel"))
+		register_device_proc("lcd", "HX8389", "Truly");
+	else
+		register_device_proc("lcd", "UNKNOWN", "UNKNOWN");
+#endif
 	rc = mdss_panel_parse_dt(node, ctrl_pdata);
 	if (rc) {
 		pr_err("%s:%d panel dt parse failed\n", __func__, __LINE__);
@@ -980,6 +1231,12 @@ int mdss_dsi_panel_init(struct device_node *node,
 				"qcom,cont-splash-enabled");
 	else
 		cont_splash_enabled = false;
+/* OPPO 2013-12-09 yxq Add begin for disable continous display for ftm mode */
+#ifdef VENDOR_EDIT
+    if (MSM_BOOT_MODE__FACTORY == get_boot_mode()) {
+        cont_splash_enabled = false;
+    }
+#endif
 	if (!cont_splash_enabled) {
 		pr_info("%s:%d Continuous splash flag not found.\n",
 				__func__, __LINE__);
