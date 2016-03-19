@@ -194,7 +194,6 @@
 			qcom,v-cutoff-uv = <3500000>;
 			qcom,max-voltage-uv = <4340000>;
 			qcom,r-conn-mohm = <0>;
-			/* Fanhong.Kong@ProDrv.CHG modify 2014.2.28*/
 			qcom,shutdown-soc-valid-limit = <20>;
 			qcom,adjust-soc-low-threshold = <15>;
 			qcom,ocv-voltage-high-threshold-uv = <3750000>;
@@ -205,7 +204,6 @@
 			qcom,calculate-soc-ms = <20000>;
 			qcom,chg-term-ua = <100000>;
 			qcom,batt-type = <6>;
-			/* Fanhong.Kong@ProDrv.CHG modify 2014.2.28*/
 			qcom,tm-temp-margin = <20000>;
 			qcom,low-ocv-correction-limit-uv = <100>;
 			qcom,high-ocv-correction-limit-uv = <50>;
@@ -218,7 +216,6 @@
 			qcom,bms-iadc@3800 {
 				reg = <0x3800 0x100>;
 			};
-			/* Fanhong.Kong@ProDrv.CHG add 2014.2.28*/
 			qcom,vref-ctrl@124a {
 				reg = <0x124a 0x1>;
 			};
@@ -493,9 +490,6 @@
 			#address-cells = <1>;
 			#size-cells = <1>;
 			qcom,qpnp-rtc-write = <0>;
-			/* Yixue.Ge@ProDrv.BL modify for enable rtc powerup
-			qcom,qpnp-rtc-alarm-pwrup = <0>;
-			*/
 			qcom,qpnp-rtc-alarm-pwrup = <1>;
 			qcom,pm8226_rtc_rw@6000 {
 				reg = <0x6000 0x100>;
@@ -858,10 +852,9 @@
 
 		qcom,leds@d300 {
 			compatible = "qcom,leds-qpnp";
-			status = "okay"; //zhengrong.zhang@camera.drv modify for led from tong.han modify
+			status = "okay";
 			reg = <0xd300 0x100>;
 			label = "flash";
-			//flash-boost-supply = <&pm8226_chg_boost>; //zhengrong.zhang@camera.drv modify for led
 			pm8226_flash0: qcom,flash_0 {
 				qcom,max-current = <1000>;
 				qcom,default-state = "off";

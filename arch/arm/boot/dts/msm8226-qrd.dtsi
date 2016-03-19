@@ -21,25 +21,6 @@
 		compatible = "gpio-keys";
 		input-name = "gpio-keys";
 		
-		/*Yixue.Ge@ProDrv.BL del for they are no be used at this project*/
-		/*camera_focus {
-			label = "camera_focus";
-			gpios = <&msmgpio 108 0x1>;
-			linux,input-type = <1>;
-			linux,code = <0x210>;
-			gpio-key,wakeup;
-			debounce-interval = <15>;
-		};
-
-		camera_snapshot {
-			label = "camera_snapshot";
-			gpios = <&msmgpio 107 0x1>;
-			linux,input-type = <1>;
-			linux,code = <0x2fe>;
-			gpio-key,wakeup;
-			debounce-interval = <15>;
-		};*/
-
 		vol_up {
 			label = "volume_up";
 			gpios = <&msmgpio 107 0x1>;
@@ -49,7 +30,7 @@
 			debounce-interval = <15>;
 		};
 		
-		vol_down { /*Yixue.Ge@ProDrv.BL add for volume down key*/
+		vol_down {
 			label = "volume_down";
 			gpios = <&msmgpio 106 0x1>;
 			linux,input-type = <1>;
@@ -88,7 +69,6 @@
 			"MIC BIAS3 External", "Analog Mic4";
 
 		qcom,cdc-mclk-gpios = <&pm8226_gpios 1 0>;
-/*		qcom,cdc-vdd-spkr-gpios = <&pm8226_gpios 2 0>;*/
 		qcom,cdc-us-euro-gpios = <&msmgpio 69 0>;
 	};
 
@@ -106,7 +86,6 @@
 			"MIC BIAS1 External", "Handset Mic";
 
 		qcom,cdc-mclk-gpios = <&pm8226_gpios 1 0>;
-/*		qcom,cdc-vdd-spkr-gpios = <&pm8226_gpios 2 0>;*/
 		qcom,cdc-us-euro-gpios = <&msmgpio 69 0>;
 	};
 };
@@ -245,13 +224,7 @@
 			qcom,led_mpp_4 {
 				label = "mpp";
 				linux,name = "front";
-				/*linux,default-trigger = "battery-full";*/
-                //#ifndef VENDOR_EDIT
-                //Lycan.Wang@Prd.BasicDrv, 2014-02-26 Remove for no linux trigger
-                //linux,default-trigger = "battery-charging";
-                //#else
-                linux,default-trigger = "none";
-                //#endif /* VENDOR_EDIT */
+				linux,default-trigger = "none";
 				qcom,default-state = "off";
 				qcom,max-current = <15>;
 				qcom,current-setting = <5>;
@@ -262,23 +235,13 @@
 				qcom,mode-ctrl = <0x60>;
 				qcom,pwm-channel = <0>;
 				qcom,start-idx = <1>;
-                //#ifndef VENDOR_EDIT
-                //Lycan.Wang@Prd.BasicDrv, 2014-02-28 Modify for breath-led blink para
-                //qcom,ramp-step-ms = <120>;
-                //qcom,duty-pcts = [00 00 00 00 00
-                //		  00 00 00 00 00
-                //		  50 00 00 00 00
-                //		  00 00 00 00 00
-                //		  00];
-                //#else /* VENDOR_EDIT */
                 qcom,ramp-step-ms = <100>;
-				qcom,duty-pcts = [10 15 20 25 30 35 40 45 50
-                          55 60 65 70 75 80 80 80 80 80
-                          80 80 75 70 65 60 55 50 45 40
-                          35 30 25 20 15 10 00 00 00 00
-                          00 00 00 00 00 00 00 00 00 00
-                          00 00 00 00 00 00];
-                //#endif /* VENDOR_EDIT */
+                qcom,duty-pcts = [10 15 20 25 30 35 40 45 50
+                		  55 60 65 70 75 80 80 80 80 80
+                		  80 80 75 70 65 60 55 50 45 40
+                		  35 30 25 20 15 10 00 00 00 00
+                		  00 00 00 00 00 00 00 00 00 00
+                		  00 00 00 00 00 00];
                 qcom,use-blink;
 			};
 		};
@@ -288,16 +251,11 @@
 			qcom,led_mpp_6 {
 				label = "mpp";
 				linux,name = "back";
-                //#ifndef VENDOR_EDIT
-                //Lycan.Wang@Prd.BasicDrv, 2014-02-26 Remove for no linux trigger
-                //linux,default-trigger = "battery-charging";
-                //#else
                 linux,default-trigger = "none";
-                //#endif /* VENDOR_EDIT */
 				qcom,default-state = "off";
 				qcom,max-current = <15>;
 				qcom,current-setting = <5>;
-				qcom,max-duty = <350>;//Fanhong.Kong@PrdDrv.CHG, 2014-04-18 for UE
+				qcom,max-duty = <350>;
 				qcom,id = <6>;
 				qcom,mode = "pwm";
 				qcom,pwm-us = <1000>;
@@ -305,23 +263,13 @@
 				qcom,source-sel = <10>;
 				qcom,pwm-channel = <5>;
 				qcom,start-idx = <1>;
-                //#ifndef VENDOR_EDIT
-                //Lycan.Wang@Prd.BasicDrv, 2014-02-28 Modify for breath-led blink para
-                //qcom,ramp-step-ms = <120>;
-                //qcom,duty-pcts = [00 00 00 00 00
-                //		  00 00 00 00 00
-                //		  50 00 00 00 00
-                //		  00 00 00 00 00
-                //		  00];
-                //#else /* VENDOR_EDIT */
                 qcom,ramp-step-ms = <100>;
-				qcom,duty-pcts = [10 15 20 25 30 35 40 45 50
-                          55 60 65 70 75 80 80 80 80 80
-                          80 80 75 70 65 60 55 50 45 40
-                          35 30 25 20 15 10 00 00 00 00
-                          00 00 00 00 00 00 00 00 00 00
-                          00 00 00 00 00 00];
-                //#endif /* VENDOR_EDIT */
+                qcom,duty-pcts = [10 15 20 25 30 35 40 45 50
+                		  55 60 65 70 75 80 80 80 80 80
+                		  80 80 75 70 65 60 55 50 45 40
+                		  35 30 25 20 15 10 00 00 00 00
+                		  00 00 00 00 00 00 00 00 00 00
+                		  00 00 00 00 00 00];
 				qcom,use-blink;
 			};
 		};
@@ -329,16 +277,11 @@
 
 	qcom,pm8226@1 {	
 		qcom,leds@d300 {
-				status = "okay"; //zhengrong.zhang@camera.drv modify for led from tong.han modify
+			status = "okay";
 		};
 
 		qcom,leds@d800 {
-//caven.han@basic.drv added avoid loading devices doesn't exist for 13095
-//#ifdef VENDOR_EDIT
-				status = "disable";
-//#else
-//				status = "okay";
-//#endif
+			status = "disable";
 			qcom,wled_0 {
 				label = "wled";
 				linux,name = "wled:backlight";
@@ -458,10 +401,6 @@
 
 &slim_msm {
 	tapan_codec {
-//#ifndef VENDOR_EDIT
-// xiaojun.lv commented for mic bias use internal cap on 2014-2-20
-//		qcom,cdc-micbias1-ext-cap;
-//#endif
 		qcom,cdc-micbias3-ext-cap;
 	};
 };
@@ -480,11 +419,6 @@
 };
 
 &android_usb {
-//#ifndef VENDOR_EDIT
-//Lycan.Wang@Prd.BasicDrv, 2014-01-26 Remove for USB config
-//	qcom,android-usb-cdrom;
-//	qcom,android-usb-internal-ums;
-//#endif /* VENDOR_EDIT */
 };
 
 &mdss_mdp {
